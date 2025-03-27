@@ -1,0 +1,11 @@
+### Update patient data
+PUT http://localhost:4000/patients/123e4567-e89b-12d3-a456-426614174000
+Content-type: application/json
+
+{
+  "name": "Jesus R2 updated",
+  "email": "jesus@gmail.com",
+  "address": "123 m22r22t2t23525235ain street",
+  "dateOfBirth": "1999-11-28"
+}
+###
