@@ -1,6 +1,7 @@
 ### Creates new patient entity
 POST http://localhost:4000/patients
 Content-type: application/json
+Authorization: Bearer {{token}}
 
 {
     "name": "with kafka",
