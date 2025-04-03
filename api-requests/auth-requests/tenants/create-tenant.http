@@ -1,0 +1,11 @@
+### POST create a tenant
+POST http://localhost:4004/auth/tenants
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name": "Tenant 3",
+    "email": "tenant3@gmail.com",
+    "phoneNumber": "123456"
+}
+###

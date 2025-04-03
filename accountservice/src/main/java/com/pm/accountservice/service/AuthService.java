@@ -1,6 +1,6 @@
 package com.pm.accountservice.service;
 
-import com.pm.accountservice.dto.LoginRequestDTO;
+import com.pm.accountservice.dto.auth.LoginRequestDTO;
 import com.pm.accountservice.util.JwtUtil;
 import io.jsonwebtoken.JwtException;
 import jakarta.validation.Valid;

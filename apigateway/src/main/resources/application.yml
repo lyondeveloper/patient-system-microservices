@@ -18,6 +18,7 @@ spring:
             - Path=/api-docs/patients
           filters:
             - RewritePath=/api-docs/patients,/v3/api-docs
+
         - id: account-service-route
           uri: http://account-service:4010
           predicates:

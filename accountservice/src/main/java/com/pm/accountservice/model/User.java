@@ -1,11 +1,18 @@
 package com.pm.accountservice.model;
 
 import jakarta.persistence.*;
+import lombok.*;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
 @Table(name="users")
+@EqualsAndHashCode(callSuper = true)
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User extends BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,52 +33,16 @@ public class User extends BaseModel {
     @Column(name="last_name", nullable = false)
     private String lastName;
 
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
+    // muchos usuarios pueden pertenecer a multiples tenants
+    // creando relacion ManyToMany con una tabla de por medio para
+    // almacenar puros IDs
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    // hacemos que user sea la tabla que tenga la clave primaria
+    @JoinTable(
+            name="user_tenant",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "tenant_id")
+    )
+    // inicializamos un Set para evitar duplicados, un Set siempre guarda datos unicos
+    private Set<Tenant> tenants;
 }

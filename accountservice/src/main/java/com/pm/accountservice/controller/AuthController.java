@@ -1,7 +1,7 @@
 package com.pm.accountservice.controller;
 
-import com.pm.accountservice.dto.LoginRequestDTO;
-import com.pm.accountservice.dto.LoginResponseDTO;
+import com.pm.accountservice.dto.auth.LoginRequestDTO;
+import com.pm.accountservice.dto.auth.LoginResponseDTO;
 import com.pm.accountservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.HttpStatus;
@@ -28,7 +28,7 @@ public class AuthController {
         }
 
         String token = tokenOptional.get();
-
+        System.out.println("TOKENNN: " + token);
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 

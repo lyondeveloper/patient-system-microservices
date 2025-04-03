@@ -18,7 +18,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         // habilitando las peticiones HTTP a los endpoints libremente con permitAll()
-        http.authorizeHttpRequests(authorize -> authorize.anyRequest().permitAll())
+        // prohibiendo requests como creacion de tenants o obtener un tenant si no esta autenticado
+//        http.authorizeHttpRequests(authorize -> authorize
+//                        .requestMatchers("/auth/login", "/auth/register").permitAll()
+//                        .requestMatchers("/auth/tenants", "/auth/tenants/{id}", "/auth/tenants/create").authenticated()
+//                        .anyRequest().denyAll())
+//                .csrf(AbstractHttpConfigurer::disable);
+        http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll())
                 .csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
