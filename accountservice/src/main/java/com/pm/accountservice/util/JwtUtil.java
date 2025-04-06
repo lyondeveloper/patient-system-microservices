@@ -1,5 +1,6 @@
 package com.pm.accountservice.util;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -11,6 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 
 // este tag registra como una clase Bean a esta clase y spring sabe como inyectar las dependencias en las otras clases
 @Component
@@ -33,6 +35,19 @@ public class JwtUtil {
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) //10 hours
                 .signWith(secretKey)
                 .compact();
+    }
+
+    public List<String> getRoleFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith((SecretKey) secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        String role = claims.get("role", String.class);
+
+        // returns as a list due to spring handling authorities in lists
+        return List.of(role);
     }
 
     public String getEmailFromToken(String token) {

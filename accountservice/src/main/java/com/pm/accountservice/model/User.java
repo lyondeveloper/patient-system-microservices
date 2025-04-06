@@ -43,10 +43,14 @@ public class User extends BaseModel {
     @Builder.Default
     private boolean isActive = true;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "address_id")
+    private Address address;
+
     // muchos usuarios pueden pertenecer a multiples tenants
     // creando relacion ManyToMany con una tabla de por medio para
     // almacenar puros IDs
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     // hacemos que user sea la tabla que tenga la clave primaria
     @JoinTable(
             name="user_tenant",

@@ -11,13 +11,15 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -49,24 +51,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             // token exists, then retrieve without bearer
             // if exists validateToken
+            // and assign role to that logged in user in JWT
             // else throw fordibben or unauthorized
             final String token = authHeader.substring(7);
 
             jwtUtil.validateToken(token);
             final String email = jwtUtil.getEmailFromToken(token);
+            // get the roles and assign it to context
+            List<String> roles = jwtUtil.getRoleFromToken(token);
+
+            // create authority with correct role
+            List<SimpleGrantedAuthority> authorities = roles
+                    .stream()
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                    .toList();
+
 
             // get user from DB, could be null
             Optional<User> user = userService.findByEmail(email);
 
             // if there is a user but no authorization
-            // set it in the security contetxt
+            // set it in the security context
             if (user.isPresent() &&
                     SecurityContextHolder.getContext().getAuthentication() == null) {
-
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         email,
                         null,
-                        Collections.emptyList()
+                        authorities
                 );
 
                 authentication.setDetails(new WebAuthenticationDetailsSource()
@@ -75,7 +86,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } catch(JwtException e) {
-            logger.error("Invalid JWT Token: " + e.getMessage());
+            logger.error("Invalid JWT token: " + e.getMessage());
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.getWriter().write("""
+                    {
+                      "timestamp": "%s",
+                      "status": 401,
+                      "error": "Unauthorized",
+                      "message": "Invalid token."
+                    }
+                    """.formatted(LocalDateTime.now()));
+            return;
         }
 
         // continue filter chain

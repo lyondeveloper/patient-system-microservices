@@ -1,0 +1,9 @@
+###  Creates a new user
+POST http://localhost:4004/api/accounts/users/create
+Content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "email":"jesus@test.com",
+  "password": "password123"
+}
