@@ -25,15 +25,25 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String email, String role) {
+    public String generateToken(String email, UserRoles role) {
         return Jwts.builder()
                 .subject(email)
-                .claim("role", role)
+                .claim("role", role.getRoleName())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) //10 hours
                 .signWith(secretKey)
                 .compact();
     }
+
+    public String getEmailFromToken(String token) {
+        return Jwts.parser()
+                .verifyWith((SecretKey) secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getSubject();
+    }
+
 
     public void validateToken(String token) {
         try {

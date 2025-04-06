@@ -1,5 +1,6 @@
 package com.pm.accountservice.model;
 
+import com.pm.accountservice.util.UserRoles;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -25,13 +26,22 @@ public class User extends BaseModel {
     private String password;
 
     @Column(nullable = false)
-    private String role;
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private UserRoles role = UserRoles.ROLE_USER;
 
     @Column(name="first_name", nullable = false)
     private String firstName;
 
     @Column(name="last_name", nullable = false)
     private String lastName;
+
+    @Column(name="phone_number")
+    private String phoneNumber;
+
+    @Column(name="is_active")
+    @Builder.Default
+    private boolean isActive = true;
 
     // muchos usuarios pueden pertenecer a multiples tenants
     // creando relacion ManyToMany con una tabla de por medio para

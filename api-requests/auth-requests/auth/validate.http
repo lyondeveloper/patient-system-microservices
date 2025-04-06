@@ -1,4 +1,4 @@
 ### GET request to validate token
-GET http://localhost:4004/auth/login/validate
+GET http://localhost:4004/api/accounts/auth/validateCurrentToken
 Authorization: Bearer {{token}}
 ###

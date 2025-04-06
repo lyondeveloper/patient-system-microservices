@@ -1,0 +1,4 @@
+### GET current authenticated user
+GET http://localhost:4004/api/accounts/users/currentUserAuthenticated
+Authorization: Bearer {{token}}
+###

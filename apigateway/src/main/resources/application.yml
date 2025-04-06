@@ -19,12 +19,23 @@ spring:
           filters:
             - RewritePath=/api-docs/patients,/v3/api-docs
 
+        # No JWT Validation routes (must be first one before the general one)
+        - id: account-auth-route
+          uri: http://account-service:4010
+          predicates:
+            - Path=/api/accounts/auth/**
+          filters:
+            - StripPrefix=1
+        # JWT Validations (outside of /accounts/auth)
         - id: account-service-route
           uri: http://account-service:4010
           predicates:
-            - Path=/auth/**
+            - Path=/api/accounts/**
           filters:
             - StripPrefix=1
+            - JwtValidation
+
+
         - id: api-docs-account-route
           uri: http://account-service:4010
           predicates:

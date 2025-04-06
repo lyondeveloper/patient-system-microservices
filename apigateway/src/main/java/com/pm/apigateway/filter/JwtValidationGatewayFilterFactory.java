@@ -1,5 +1,7 @@
 package com.pm.apigateway.filter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
@@ -11,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Component
 public class JwtValidationGatewayFilterFactory extends AbstractGatewayFilterFactory<Object> {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtValidationGatewayFilterFactory.class);
     private final WebClient webClient;
 
     public JwtValidationGatewayFilterFactory(WebClient.Builder webClientBuilder,
@@ -31,7 +34,7 @@ public class JwtValidationGatewayFilterFactory extends AbstractGatewayFilterFact
             }
 
             return webClient.get()
-                    .uri("/login/validate")
+                    .uri("/auth/validateCurrentToken")
                     .header(HttpHeaders.AUTHORIZATION, token)
                     .retrieve()
                     .toBodilessEntity()

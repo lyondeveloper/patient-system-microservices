@@ -4,6 +4,7 @@ import com.pm.accountservice.dto.auth.LoginRequestDTO;
 import com.pm.accountservice.dto.auth.LoginResponseDTO;
 import com.pm.accountservice.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/accounts/auth")
+@Tag(name = "Auth", description = "API for managing authorization")
 public class AuthController {
 
     private final AuthService authService;
@@ -28,7 +31,6 @@ public class AuthController {
         }
 
         String token = tokenOptional.get();
-        System.out.println("TOKENNN: " + token);
         return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 
@@ -36,7 +38,7 @@ public class AuthController {
     // gets the authorization header
     // to check if its valid token
     @Operation(summary = "Validates the generated token")
-    @GetMapping("/login/validate")
+    @GetMapping("/validateCurrentToken")
     public ResponseEntity<Void> validateToken(@RequestHeader("Authorization") String authHeader) {
         // Authorization: Bearer {accessToken}
 
