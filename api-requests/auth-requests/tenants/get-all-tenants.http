@@ -1,5 +1,5 @@
 ### GET request to example server
-GET http://localhost:4004/auth/tenants
+GET http://localhost:4004/api/accounts/tenants
 Content-Type: application/json
 Authorization: Bearer {{token}}
 ###

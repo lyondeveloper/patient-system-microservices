@@ -1,5 +1,10 @@
 package com.pm.accountservice.exceptions;
 
+import com.pm.accountservice.exceptions.address.AddressExceptions;
+import com.pm.accountservice.exceptions.tenants.TenantNameAlreadyExistsException;
+import com.pm.accountservice.exceptions.tenants.TenantNotFoundException;
+import com.pm.accountservice.exceptions.users.CreateNewUserException;
+import com.pm.accountservice.exceptions.users.UserProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +38,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
         Map<String, String> errors = new HashMap<>();
         // logging for dev to check error
-        log.warn("Email address already exists {}", ex.getMessage());
+        log.error("Email address already exists {}", ex.getMessage());
         errors.put("message", "Email address already exists");
         return ResponseEntity.badRequest().body(errors);
     }
@@ -42,8 +47,32 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleTenantNameAlreadyExistsException(TenantNameAlreadyExistsException ex) {
         Map<String, String> errors = new HashMap<>();
         // logging for dev to check error
-        log.warn("Tenant name already exists {}", ex.getMessage());
+        log.error("Tenant name already exists {}", ex.getMessage());
         errors.put("message", "Tenant name already exists");
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(CreateNewUserException.class)
+    public ResponseEntity<Map<String, String>> handleCreateNewUserException(CreateNewUserException ex) {
+        Map<String, String> errors = new HashMap<>();
+        log.error("Error while creating a new user {}", ex.getMessage());
+        errors.put("message", "Error while creating a new user");
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(TenantNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleTenantNotFoundException(TenantNotFoundException ex) {
+        Map<String, String> errors = new HashMap<>();
+        log.error("Error while fetching this tenant {}", ex.getMessage());
+        errors.put("message", "Tenant does not exist with this ID");
+        return ResponseEntity.badRequest().body(errors);
+    }
+
+    @ExceptionHandler(UserProcessingException.class)
+    public ResponseEntity<Map<String, String>> handleUserProcessingException(UserProcessingException ex) {
+        Map<String, String> errors = new HashMap<>();
+        log.error("Error while processing a new user {}", ex.getMessage());
+        errors.put("message", ex.getMessage());
         return ResponseEntity.badRequest().body(errors);
     }
 

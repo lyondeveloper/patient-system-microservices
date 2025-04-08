@@ -1,5 +1,6 @@
 package com.pm.accountservice.dto.tenant;
 
+import com.pm.accountservice.dto.user.UserResponseDTO;
 import com.pm.accountservice.model.Address;
 import com.pm.accountservice.model.TenantMedicament;
 import com.pm.accountservice.model.User;
@@ -9,7 +10,6 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
-import java.util.Set;
 
 @Data
 @AllArgsConstructor
@@ -26,6 +26,6 @@ public class TenantRequestDTO {
 
     private String phoneNumber;
     private List<TenantMedicament> medicaments;
-    private Set<User> users;
+    private List<User> users;
     private Address address;
 }

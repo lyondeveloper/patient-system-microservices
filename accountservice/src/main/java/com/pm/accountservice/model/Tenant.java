@@ -26,12 +26,13 @@ public class Tenant extends BaseModel {
     @Column(name="phone_number")
     private String phoneNumber;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name="tenant_id")
     private List<TenantMedicament> medicaments = new ArrayList<>();
 
-    @ManyToMany(mappedBy = "tenants")
-    private Set<User> users = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private List<User> users = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id")

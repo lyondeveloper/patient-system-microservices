@@ -27,7 +27,8 @@ public class TenantMapper {
         return Tenant.builder()
                 .name(tenantRequestDto.getName())
                 .email(tenantRequestDto.getEmail())
-                .phoneNumber(Optional.of(tenantRequestDto.getPhoneNumber())
+                .phoneNumber(Optional.of(tenantRequestDto)
+                        .map(TenantRequestDTO::getPhoneNumber)
                         .orElse(null))
                 .address(mapAddress(tenantRequestDto))
                 .medicaments(mapMedicaments(tenantRequestDto))
@@ -35,10 +36,10 @@ public class TenantMapper {
                 .build();
     }
 
-    private static Set<User> mapUsers(TenantRequestDTO tenantRequestDto) {
-        return Optional.of(tenantRequestDto)
+    private static List<User> mapUsers(TenantRequestDTO tenantRequestDto) {
+        return Optional.ofNullable(tenantRequestDto)
                 .map(TenantRequestDTO::getUsers)
-                .orElse(Collections.emptySet());
+                .orElse(Collections.emptyList());
     }
 
     private static List<TenantMedicament> mapMedicaments(TenantRequestDTO tenantRequestDTO) {

@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -21,7 +20,7 @@ public class TenantResponseDTO {
     private String name;
     private String email;
     private String phoneNumber;
-    private Set<User> users;
+    private List<User> users;
     private List<TenantMedicament> medicaments;
     private Address address;
 }
