@@ -3,19 +3,17 @@ package com.pm.accountservice.service;
 import com.pm.accountservice.dto.user.UserRequestDTO;
 import com.pm.accountservice.dto.user.UserResponseDTO;
 import com.pm.accountservice.exceptions.users.CreateNewUserException;
+import com.pm.accountservice.exceptions.users.UserNotFound;
 import com.pm.accountservice.exceptions.users.UserProcessingException;
 import com.pm.accountservice.mapper.UserMapper;
-import com.pm.accountservice.model.Tenant;
 import com.pm.accountservice.model.User;
-import com.pm.accountservice.repository.TenantRepository;
 import com.pm.accountservice.repository.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -29,8 +27,12 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public Optional<User> findByEmail(String email) {
+    public Optional<User> findUserByEmail(String email) {
         return userRepository.findByEmail(email);
+    }
+
+    public Optional<User> findUserByEmailAndTenantId(String email, UUID tenantId) {
+        return userRepository.findByEmailAndTenantId(email, tenantId);
     }
 
     public Optional<UserResponseDTO> getCurrentUserAuthenticated() {
@@ -42,38 +44,37 @@ public class UserService {
         }
 
         var email = auth.getName();
-        var userAuthenticated = userRepository.findByEmail(email);
+        var tenantId = CommonService.getCurrentTenantId();
+        var userAuthenticated = userRepository.findByEmailAndTenantId(email, UUID.fromString(tenantId));
 
         return userAuthenticated.map(UserMapper::toUserResponseDTO);
     }
 
+    public UserResponseDTO getUserById(String userId) {
+        var currentTenantId = CommonService.getCurrentTenantId();
+
+        var userFound = userRepository.findByIdAndTenantIdWithRelations(UUID.fromString(userId), UUID.fromString(currentTenantId))
+                .orElseThrow(() -> new UserNotFound("This user does not exist or does not belong to this tenant"));
+
+        return UserMapper.toUserResponseDTO(userFound);
+    }
+
+    public List<UserResponseDTO> getAllUsersByTenantId() {
+        var currentTenantId = CommonService.getCurrentTenantId();
+
+        var users = userRepository.findAllWithRelationsByTenantId(UUID.fromString(currentTenantId));
+
+        return users
+                .stream()
+                .map(UserMapper::toUserResponseDTO)
+                .toList();
+    }
+
     /**
-     * Main method to process a user and associate them with its tenants.
-     * This is not a transactional method but calls methods that are
-     * capturing exceptions along the way.
-     *
-     * @param newUser User to process
-     * @throws UserProcessingException throw exception if doesnt work.
-     */
-//    private void processNewUserAssociationWithTenants(User newUser) throws UserProcessingException {
-//        try {
-//            log.info("Processing new user association");
-//            associateUserWithItsTenants(newUser);
-//            log.info("New user association processed");
-//        } catch (DataAccessException e) {
-//            // catching specific exception on data saving or association
-////            log.warn("Data error in DB while associating user: {}", e.getMessage());
-//            throw new UserProcessingException("Error in DB while associating user: " + e);
-//        } catch (Exception e) {
-////            log.warn("Unexpected error while associating user: {}", e.getMessage());
-//            throw new UserProcessingException("Unexpected error while associating user: " + e);
-//        }
-//    }
-    /**
-     * Transactional method to create a user, call this from any method outside this UserService.
+     * method to create a user, call this from any method outside this UserService.
      *
      * @param userRequestDTO User DTO from client
-     * @return user process successfully fully mapped with its tenants.
+     * @return user process successfully fully mapped with its tenant and address.
      * @throws UserProcessingException throw exception if doesnt work.
      */
     public UserResponseDTO createUser(UserRequestDTO userRequestDTO) {
@@ -82,16 +83,12 @@ public class UserService {
             throw new CreateNewUserException("A user with this email already exists");
         }
 
+        var currentTenantId = CommonService.getCurrentTenantId();
+
+        userRequestDTO.setTenantId(UUID.fromString(currentTenantId));
+
         // no exceptions, all good, save
         var userCreated = userRepository.save(UserMapper.toUserModel(userRequestDTO));
-//TODO: luego veo que pasa con la asociacion
-//        if (userRequestDTO.getTenantsIds() != null && !userRequestDTO.getTenantsIds().isEmpty()) {
-//            log.info("Started association");
-//            // associating tenants with the userCreated
-//            processNewUserAssociationWithTenants(userCreated);
-//        } else {
-//            log.info("No tenants to associate with this user {}", userCreated.getId());
-//        }
 
         return UserMapper.toUserResponseDTO(userCreated);
     }

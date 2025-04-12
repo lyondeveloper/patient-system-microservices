@@ -1,0 +1,5 @@
+### GET ALL users
+GET http://localhost:4004/api/accounts/users
+Content-Type: application/json
+Authorization: Bearer {{token}}
+###

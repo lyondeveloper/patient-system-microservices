@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -57,6 +58,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             jwtUtil.validateToken(token);
             final String email = jwtUtil.getEmailFromToken(token);
+            final String tenantId = jwtUtil.getTenantIdFromToken(token);
             // get the roles and assign it to context
             List<String> roles = jwtUtil.getRoleFromToken(token);
 
@@ -68,7 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 
             // get user from DB, could be null
-            Optional<User> user = userService.findByEmail(email);
+            Optional<User> user = userService.findUserByEmailAndTenantId(email, UUID.fromString(tenantId));
 
             // if there is a user but no authorization
             // set it in the security context
@@ -80,8 +82,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         authorities
                 );
 
-                authentication.setDetails(new WebAuthenticationDetailsSource()
-                        .buildDetails(request));
+                authentication.setDetails(new CustomAuthenticationDetails(tenantId, request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
 
@@ -103,4 +104,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // continue filter chain
         filterChain.doFilter(request, response);
     }
+
 }

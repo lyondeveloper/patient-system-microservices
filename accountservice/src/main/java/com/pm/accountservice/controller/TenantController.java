@@ -25,14 +25,6 @@ public class TenantController {
         this.tenantService = tenantService;
     }
 
-    @Operation(summary = "Get all tenants")
-    @GetMapping
-    public ResponseEntity<List<TenantResponseDTO>> getAllTenants() {
-        var allTenants = tenantService.getAllTenants();
-
-        return ResponseEntity.ok().body(allTenants);
-    }
-
     // TODO: validate correctly with exceptions
     @Operation(summary = "Creates a new tenant")
     @PostMapping("/create")

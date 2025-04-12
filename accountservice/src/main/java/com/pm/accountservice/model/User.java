@@ -30,6 +30,9 @@ public class User extends BaseModel {
     @Builder.Default
     private UserRoles role = UserRoles.ROLE_USER;
 
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
+
     @Column(name="first_name", nullable = false)
     private String firstName;
 
@@ -46,21 +49,4 @@ public class User extends BaseModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "address_id")
     private Address address;
-
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name = "tenant_id")
-    private Tenant tenant;
-
-//    // muchos usuarios pueden pertenecer a multiples tenants
-//    // creando relacion ManyToMany con una tabla de por medio para
-//    // almacenar puros IDs
-//    @ManyToMany(fetch = FetchType.LAZY)
-//    // hacemos que user sea la tabla que tenga la clave primaria
-//    @JoinTable(
-//            name="user_tenants",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "tenant_id")
-//    )
-//    // inicializamos un Set para evitar duplicados, un Set siempre guarda datos unicos
-//    private Set<Tenant> tenants = new HashSet<>();
 }

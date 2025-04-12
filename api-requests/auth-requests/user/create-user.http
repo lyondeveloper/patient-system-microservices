@@ -4,9 +4,9 @@ Content-type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "email":"jesus3@test.com",
+  "email":"jesus6@test.com",
   "password": "12345678",
   "firstName": "first_new",
   "lastName": "last_new",
-  "tenantId": "f6c8bfda-96ed-46b9-bdb9-571cc8b8f867"
+  "addressId": "1e6a87f0-1a7b-4f0a-9c2d-3e8b6f4a1e9c"
 }

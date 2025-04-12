@@ -26,15 +26,7 @@ public class Tenant extends BaseModel {
     @Column(name="phone_number")
     private String phoneNumber;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinColumn(name="tenant_id")
-    private List<TenantMedicament> medicaments = new ArrayList<>();
-
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private List<User> users = new ArrayList<>();
-
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "address_id")
     private Address address;
 }

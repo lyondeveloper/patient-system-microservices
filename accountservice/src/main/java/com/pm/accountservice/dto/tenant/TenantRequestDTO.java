@@ -1,15 +1,10 @@
 package com.pm.accountservice.dto.tenant;
 
-import com.pm.accountservice.dto.user.UserResponseDTO;
 import com.pm.accountservice.model.Address;
-import com.pm.accountservice.model.TenantMedicament;
-import com.pm.accountservice.model.User;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-
-import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -25,7 +20,7 @@ public class TenantRequestDTO {
     private String email;
 
     private String phoneNumber;
-    private List<TenantMedicament> medicaments;
-    private List<User> users;
+
+    @NotBlank(message = "Address is required")
     private Address address;
 }

@@ -13,6 +13,7 @@ import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 // este tag registra como una clase Bean a esta clase y spring sabe como inyectar las dependencias en las otras clases
 @Component
@@ -27,9 +28,11 @@ public class JwtUtil {
         this.secretKey = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String email, UserRoles role) {
+    public String generateToken(String email, UserRoles role, UUID tenantId) {
+        System.out.println("DATA: " + email + role + tenantId);
         return Jwts.builder()
                 .subject(email)
+                .claim("tenantId", tenantId.toString())
                 .claim("role", role.getRoleName())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)) //10 hours
@@ -57,6 +60,16 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+    }
+
+    public String getTenantIdFromToken(String token) {
+        Claims claims =  Jwts.parser()
+                .verifyWith((SecretKey) secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        return claims.get("tenantId", String.class);
     }
 
 

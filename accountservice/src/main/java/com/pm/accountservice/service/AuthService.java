@@ -24,14 +24,16 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
+
+
     public Optional<String> authenticate(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         // Getting a user from the userservice
         // filter by password matching
         // generating a token to return the authenticated user
         return userService
-                .findByEmail(loginRequestDTO.getEmail())
+                .findUserByEmail(loginRequestDTO.getEmail())
                 .filter(u -> passwordEncoder.matches(loginRequestDTO.getPassword(), u.getPassword()))
-                .map(u -> jwtUtil.generateToken(u.getEmail(), u.getRole()));
+                .map(u -> jwtUtil.generateToken(u.getEmail(), u.getRole(), u.getTenantId()));
     }
 
     public boolean validateToken(String token) {

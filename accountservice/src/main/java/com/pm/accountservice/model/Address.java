@@ -25,7 +25,10 @@ public class Address extends BaseModel {
     private String state;
     @Column(nullable = false)
     private String country;
-
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
+
+
+    @Column(name = "tenant_id", nullable = false)
+    private UUID tenantId;
 }

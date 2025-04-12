@@ -16,11 +16,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class TenantResponseDTO {
-    private UUID id;
+    private String id;
     private String name;
     private String email;
     private String phoneNumber;
-    private List<User> users;
-    private List<TenantMedicament> medicaments;
     private Address address;
 }

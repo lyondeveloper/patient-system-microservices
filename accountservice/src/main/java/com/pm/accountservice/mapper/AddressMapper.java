@@ -1,5 +1,6 @@
 package com.pm.accountservice.mapper;
 
+import com.pm.accountservice.dto.address.AddressRequestDTO;
 import com.pm.accountservice.dto.address.AddressResponseDTO;
 import com.pm.accountservice.model.Address;
 
@@ -11,22 +12,21 @@ public class AddressMapper {
     public static AddressResponseDTO transformToDto(Address address) {
         return AddressResponseDTO.builder()
                 .id(address.getId().toString())
-                .city(Optional.of(address.getCity()).orElse(null))
-                .street(Optional.of(address.getStreet()).orElse(null))
-                .state(Optional.of(address.getState()).orElse(null))
-                .country(Optional.of(address.getCountry()).orElse(null))
-                .zipCode(Optional.of(address.getZipCode()).orElse(null))
+                .city(address.getCity())
+                .street(address.getStreet())
+                .state(address.getState())
+                .country(address.getCountry())
+                .zipCode(address.getZipCode())
                 .build();
     }
 
-    public static Address transformToModel(AddressResponseDTO addressResponseDTO) {
+    public static Address transformToModel(AddressRequestDTO addressRequestDTO) {
         return Address.builder()
-                .id(UUID.fromString(addressResponseDTO.getId()))
-                .city(addressResponseDTO.getCity())
-                .street(addressResponseDTO.getStreet())
-                .state(addressResponseDTO.getState())
-                .country(addressResponseDTO.getCountry())
-                .zipCode(addressResponseDTO.getZipCode())
+                .city(addressRequestDTO.getCity())
+                .street(addressRequestDTO.getStreet())
+                .state(addressRequestDTO.getState())
+                .country(addressRequestDTO.getCountry())
+                .zipCode(addressRequestDTO.getZipCode())
                 .build();
     }
 }

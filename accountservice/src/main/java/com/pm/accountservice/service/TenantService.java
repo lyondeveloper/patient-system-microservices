@@ -21,19 +21,6 @@ public class TenantService {
         this.tenantRepository = tenantRepository;
     }
 
-    public List<TenantResponseDTO> getAllTenants() {
-        var allTenants = tenantRepository.findAll();
-
-        return allTenants.stream().map(TenantMapper::toDto).toList();
-    }
-
-    public TenantResponseDTO getTenantById(String id) {
-        var tenant = tenantRepository.findById(UUID.fromString(id)).orElseThrow(() ->
-                new TenantNotFoundException("The tenant with the id " + id + " does not exist"));
-
-        return TenantMapper.toDto(tenant);
-    }
-
     public TenantResponseDTO createTenant(TenantRequestDTO tenantRequestDTO) {
         if (tenantRepository.existsByEmail(tenantRequestDTO.getEmail())) {
             throw new EmailAlreadyExistsException("A Tenant with this email already exists");

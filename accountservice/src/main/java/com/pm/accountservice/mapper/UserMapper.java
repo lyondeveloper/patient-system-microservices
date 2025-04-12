@@ -1,7 +1,9 @@
 package com.pm.accountservice.mapper;
 
+import com.pm.accountservice.dto.tenant.TenantResponseDTO;
 import com.pm.accountservice.dto.user.UserRequestDTO;
 import com.pm.accountservice.dto.user.UserResponseDTO;
+import com.pm.accountservice.model.Address;
 import com.pm.accountservice.model.User;
 
 import java.util.*;
@@ -16,13 +18,18 @@ public class UserMapper {
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
                 .isActive(user.isActive())
-                .tenant(user.getTenant())
+                // address can be null, we wrap those in Optional and
+                // build it with correspondant mappers methods
+                .tenantId(user.getTenantId().toString())
+                .address(Optional.of(user)
+                        .map(User::getAddress)
+                        .map(AddressMapper::transformToDto)
+                        .orElse(null))
                 .role(String.valueOf(user.getRole()))
                 .build();
     }
 
     public static User toUserModel(UserRequestDTO userRequestDTO) {
-        System.out.println("ENTRO");
         return User.builder()
                 .firstName(userRequestDTO.getFirstName())
                 .lastName(userRequestDTO.getLastName())
@@ -30,12 +37,13 @@ public class UserMapper {
                 .password(userRequestDTO.getPassword())
                 .phoneNumber(userRequestDTO.getPhoneNumber())
                 .isActive(userRequestDTO.isActive())
-                .tenant(
-                        Optional.of(userRequestDTO)
-                                .map(UserRequestDTO::getTenantId)
-                                .orElse(null)
-                )
-                // .address(mapAddress(userRequestDTO.getAddressId()))
+                .tenantId(userRequestDTO.getTenantId())
+                .address(Optional.of(userRequestDTO)
+                        .map(UserRequestDTO::getAddressId)
+                        .map(addressId -> Address.builder()
+                                .id(UUID.fromString(addressId))
+                                .build())
+                        .orElse(null))
                 .build();
     }
 }

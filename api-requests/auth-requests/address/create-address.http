@@ -1,0 +1,13 @@
+### POST create address
+POST http://localhost:4004/api/accounts/address/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "country": "Venezuela",
+  "zipCode": "4019",
+  "state": "Zulia",
+  "city": "Ojeda",
+  "street": "Calle Piar2"
+}
+###

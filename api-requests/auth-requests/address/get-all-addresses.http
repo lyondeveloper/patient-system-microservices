@@ -1,0 +1,5 @@
+### GET ALL addresses
+GET http://localhost:4004/api/accounts/address
+Content-Type: application/json
+Authorization: Bearer {{token}}
+###

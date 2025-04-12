@@ -1,0 +1,5 @@
+### GET request to example server
+GET http://localhost:4004/api/accounts/address/61a7a762-f5a2-456f-aecd-5c38e276e8aa
+Content-Type: application/json
+Authorization: Bearer {{token}}
+###
