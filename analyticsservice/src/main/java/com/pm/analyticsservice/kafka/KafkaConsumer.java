@@ -1,11 +1,10 @@
-package com.pm.analyticsservice.kafka;
+package com.pm.patientservice.kafka;
 
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
-import patient.events.PatientEvent;
 
 @Service
 public class KafkaConsumer {

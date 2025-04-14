@@ -34,6 +34,7 @@ public class UserRequestDTO {
     private String phoneNumber;
     private boolean isActive;
 
+    private String type;
     private String addressId;
     private UUID tenantId;
 }

@@ -1,6 +1,7 @@
 package com.pm.accountservice.model;
 
 import com.pm.accountservice.util.UserRoles;
+import com.pm.accountservice.util.UserTypes;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,6 +27,12 @@ public class User extends BaseModel {
     @Column(nullable = false)
     private String password;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    @Builder.Default
+    private UserTypes type = UserTypes.USER_DEFAULT;
+
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     @Builder.Default
     private UserRoles role = UserRoles.ROLE_USER;

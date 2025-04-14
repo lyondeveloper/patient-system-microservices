@@ -1,83 +1,59 @@
 package com.pm.patientservice.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
-public class Patient {
-
+@Table(name = "patients")
+@Data
+@Builder
+@EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class Patient extends BaseModel {
     @Id
-    // Este generated value con el generationtype auto dice a la entidad que este campo se generara solo por la db
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @NotNull
-    private String name;
+    @Column(name = "user_id", nullable = false, unique = true)
+    private UUID userId;
 
-    @NotNull
-    @Email
-    // este campo es unico siempre
-    @Column(unique=true)
-    private String email;
+    @Column(name = "blood_type", nullable = false)
+    private String bloodType;
+    @Column(nullable = false)
+    private String gender;
 
-    @NotNull
-    private String address;
+    private BigDecimal weight;
+    private BigDecimal height;
 
-    @NotNull
-    private LocalDate dateOfBirth;
-
-    @NotNull
+    @Column(name = "registered_date", nullable = false)
     private LocalDate registeredDate;
+    @Column(name = "date_of_birth", nullable = false)
+    private LocalDate dateOfBirth;
+    // note: convert this to another model
+    // maybe to take better the history if there are more fields
+    // i have an idea talking with glay, but leave it like that
+    @Column(name = "medical_history")
+    private String medicalHistory;
 
-    public UUID getId() {
-        return id;
-    }
+    // se necesita guardar la lista de strings en una tabla aparte para escabilidad
+    // se pueden agregar muchas alergias y es preferible
+    // JPA no permite hacerlo sin convertirlo a un String deserializado
+    // o hacer este approach con ElementCollection
+    @ElementCollection
+    @CollectionTable(name = "patient_allergies", joinColumns = @JoinColumn(name = "patient_id"))
+    private List<String> allergies;
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    @Column(name = "emergency_contact_phone", nullable = false)
+    private String emergencyContactPhone;
 
-    public @NotNull String getName() {
-        return name;
-    }
-
-    public void setName(@NotNull String name) {
-        this.name = name;
-    }
-
-    public @NotNull @Email String getEmail() {
-        return email;
-    }
-
-    public void setEmail(@NotNull @Email String email) {
-        this.email = email;
-    }
-
-    public @NotNull String getAddress() {
-        return address;
-    }
-
-    public void setAddress(@NotNull String address) {
-        this.address = address;
-    }
-
-    public @NotNull LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(@NotNull LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public @NotNull LocalDate getRegisteredDate() {
-        return registeredDate;
-    }
-
-    public void setRegisteredDate(@NotNull LocalDate registeredDate) {
-        this.registeredDate = registeredDate;
-    }
+    @Column(name = "insurance_provider")
+    private String insuranceProvider;
+    @Column(name = "insurance_number")
+    private String insuranceNumber;
 }

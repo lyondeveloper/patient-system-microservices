@@ -36,11 +36,18 @@ public class PatientController {
     @GetMapping("/{id}")
     @Operation(summary = "Get single patient")
     public ResponseEntity<PatientResponseDTO> getSinglePatient(@PathVariable UUID id) {
-        PatientResponseDTO patient = patientService.getSinglePatient(id);
+        PatientResponseDTO patient = patientService.getPatientById(id);
         return ResponseEntity.ok().body(patient);
     }
 
-    @PostMapping
+    @GetMapping("/byUserId/{userId}")
+    @Operation(summary = "Get single patient")
+    public ResponseEntity<PatientResponseDTO> getPatientByUserId(@PathVariable String userId) {
+        PatientResponseDTO patient = patientService.getPatientByUserId(userId);
+        return ResponseEntity.ok().body(patient);
+    }
+
+    @PostMapping("/create")
     @Operation(summary = "Create a new patient")
     // validated aca con el grupo para que el controlador sepa que no requerimos que chequee la validacion para registeredDate notBlank ya que
     // no queremos que al actualizar un paciente, este campo vuelva a ser actualizado

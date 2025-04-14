@@ -5,6 +5,7 @@ import com.pm.accountservice.dto.user.UserResponseDTO;
 import com.pm.accountservice.exceptions.users.CreateNewUserException;
 import com.pm.accountservice.exceptions.users.UserNotFound;
 import com.pm.accountservice.exceptions.users.UserProcessingException;
+import com.pm.accountservice.kafka.KafkaProducer;
 import com.pm.accountservice.mapper.UserMapper;
 import com.pm.accountservice.model.User;
 import com.pm.accountservice.repository.UserRepository;
@@ -22,9 +23,14 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final KafkaProducer kafkaProducer;
 
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                        KafkaProducer kafkaProducer
+    ) {
+        this.kafkaProducer = kafkaProducer;
         this.userRepository = userRepository;
+
     }
 
     public Optional<User> findUserByEmail(String email) {
@@ -89,6 +95,9 @@ public class UserService {
 
         // no exceptions, all good, save
         var userCreated = userRepository.save(UserMapper.toUserModel(userRequestDTO));
+
+        // send kafka event for any MS to catch the userCreated
+        kafkaProducer.sendUserCreatedEvent(userCreated);
 
         return UserMapper.toUserResponseDTO(userCreated);
     }

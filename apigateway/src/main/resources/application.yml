@@ -6,7 +6,7 @@ spring:
     gateway:
       routes:
         - id: patient-service-route
-          uri: http://patient-service:4000
+          uri: http://patient-service:4009
           predicates:
             - Path=/api/patients/**
           filters:

@@ -1,0 +1,17 @@
+### Creates new patient entity
+POST http://localhost:4004/api/patients/create
+Content-type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "userId": "94fa852a-4d16-498d-a00e-f37a0eeda911",
+    "dateOfBirth": "1999-02-10",
+    "registeredDate": "2025-11-28",
+    "bloodType": "+A",
+    "gender": "M",
+  "medicalHistory": "lorem ipsum",
+  "patientAllergies": ["allergies, allergies2"],
+  "emergencyContactPhone": "+123456"
+}
+
+###

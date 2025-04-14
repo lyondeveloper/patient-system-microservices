@@ -1,23 +1,22 @@
 package com.pm.patientservice.dto;
 
 import com.pm.patientservice.dto.validators.CreatePatientValidationGroup;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+import java.util.List;
+
+@Builder
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class PatientRequestDTO {
-    // aca se usan validaciones que necesitamos que el frontend respete
-    @NotBlank(message = "Name is required")
-    @Size(max = 100, message = "Name cannot be exceed 100 characters")
-    private String name;
-
-    @NotBlank(message = "Email is required")
-    @Email(message = "Email should be valid")
-    private String email;
-
-    @NotBlank(message = "Address is required")
-    private String address;
+    @NotBlank(groups=CreatePatientValidationGroup.class, message = "A user to attach this patient to is required")
+    private String userId;
 
     @NotBlank(message = "Date of birth is required")
     private String dateOfBirth;
@@ -26,43 +25,20 @@ public class PatientRequestDTO {
     @NotBlank(groups=CreatePatientValidationGroup.class, message = "Registered Date is required")
     private String registeredDate;
 
-    public String getName() {
-        return name;
-    }
+    private BigDecimal weight;
+    private BigDecimal height;
+    @NotBlank(message = "Gender is required")
+    private String gender;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    @NotBlank(message = "Blood Type is required")
+    private String bloodType;
 
-    public String getEmail() {
-        return email;
-    }
+    @NotBlank(message = "An emergency contact is required")
+    private String emergencyContactPhone;
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
+    private List<String> allergies;
+    private String medicalHistory;
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(String dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getRegisteredDate() {
-        return registeredDate;
-    }
-
-    public void setRegisteredDate(String registeredDate) {
-        this.registeredDate = registeredDate;
-    }
+    private String insuranceProvider;
+    private String insuranceNumber;
 }

@@ -5,29 +5,32 @@ import com.pm.patientservice.dto.PatientResponseDTO;
 import com.pm.patientservice.model.Patient;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
-// Mapper es una capa de comunicacion entre lo que devuelve el frontend en formad e DTO y la transformacion del DTO al modelo para que la DB entienda
 public class PatientMapper {
     public static PatientResponseDTO toDto(Patient patient) {
-        PatientResponseDTO patientDto = new PatientResponseDTO();
-        patientDto.setId(patient.getId().toString());
-        patientDto.setName(patient.getName());
-        patientDto.setAddress(patient.getAddress());
-        patientDto.setDateOfBirth(patient.getDateOfBirth().toString());
-        patientDto.setEmail(patient.getEmail());
-
-        return patientDto;
+        return PatientResponseDTO.builder()
+                .id(patient.getId().toString())
+                .userId(patient.getUserId().toString())
+                .createdAt(patient.getCreatedDate())
+                .lastModifiedDate(patient.getLastModifiedDate())
+                .build();
     }
 
     public static Patient toModel(PatientRequestDTO patientRequestDTO) {
-        Patient patient = new Patient();
-
-        patient.setName(patientRequestDTO.getName());
-        patient.setAddress(patientRequestDTO.getAddress());
-        patient.setDateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()));
-        patient.setRegisteredDate(LocalDate.parse(patientRequestDTO.getRegisteredDate()));
-        patient.setEmail(patientRequestDTO.getEmail());
-
-        return patient;
+        return Patient.builder()
+                .userId(UUID.fromString(patientRequestDTO.getUserId()))
+                .bloodType(patientRequestDTO.getBloodType())
+                .gender(patientRequestDTO.getGender())
+                .weight(patientRequestDTO.getWeight())
+                .height(patientRequestDTO.getHeight())
+                .dateOfBirth(LocalDate.parse(patientRequestDTO.getDateOfBirth()))
+                .registeredDate(LocalDate.parse(patientRequestDTO.getRegisteredDate()))
+                .medicalHistory(patientRequestDTO.getMedicalHistory())
+                .allergies(patientRequestDTO.getAllergies())
+                .emergencyContactPhone(patientRequestDTO.getEmergencyContactPhone())
+                .insuranceNumber(patientRequestDTO.getInsuranceNumber())
+                .insuranceProvider(patientRequestDTO.getInsuranceProvider())
+                .build();
     }
 }

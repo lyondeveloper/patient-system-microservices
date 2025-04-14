@@ -17,6 +17,8 @@ public class UserResponseDTO {
     private String lastName;
     private String role;
     private String phoneNumber;
+    private String type;
+    private String createdDate;
     private boolean isActive;
     private String email;
     private String tenantId;

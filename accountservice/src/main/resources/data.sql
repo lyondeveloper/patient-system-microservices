@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS "users" (
     is_active BOOLEAN DEFAULT TRUE,
     tenant_id UUID NOT NULL,
     address_id UUID NOT NULL,
+    type VARCHAR(50) NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (tenant_id) REFERENCES tenants(id) ON DELETE RESTRICT,
@@ -96,8 +97,8 @@ CREATE TABLE IF NOT EXISTS "users" (
     );
 
 -- Insert the user if no existing user with the same id or email exists
-INSERT INTO "users" (id, tenant_id, address_id, email, password, role, first_name, last_name, phone_number, is_active, created_at, updated_at)
-SELECT '223e4567-e89b-12d3-a456-426614174006', 'afd4eb70-c4e9-41b1-9034-048103d30c98', '1e6a87f0-1a7b-4f0a-9c2d-3e8b6f4a1e9c' , 'jesus@test.com',
+INSERT INTO "users" (id, tenant_id, address_id, type, email, password, role, first_name, last_name, phone_number, is_active, created_at, updated_at)
+SELECT '223e4567-e89b-12d3-a456-426614174006', 'afd4eb70-c4e9-41b1-9034-048103d30c98', '1e6a87f0-1a7b-4f0a-9c2d-3e8b6f4a1e9c' , 'USER_DEFAULT' ,'jesus@test.com',
        '$2b$12$7hoRZfJrRKD2nIm2vHLs7OBETy.LWenXXMLKf99W8M4PUwO6KB7fu', 'ROLE_USER',
        'jesus', 'rincon', '+1234567890', TRUE,
        '2025-04-02 10:00:00', '2025-04-02 10:00:00'
@@ -108,8 +109,8 @@ SELECT '223e4567-e89b-12d3-a456-426614174006', 'afd4eb70-c4e9-41b1-9034-048103d3
 );
 
 -- Insert the user if no existing user with the same id or email exists
-INSERT INTO "users" (id, tenant_id, address_id ,email, password, role, first_name, last_name, phone_number, is_active, created_at, updated_at)
-SELECT '223e4567-e89b-12d3-a456-426614174010', 'afd4eb70-c4e9-41b1-9034-048103d30c98', '1e6a87f0-1a7b-4f0a-9c2d-3e8b6f4a1e9c' ,'jesus2@test.com',
+INSERT INTO "users" (id, type, tenant_id, address_id ,email, password, role, first_name, last_name, phone_number, is_active, created_at, updated_at)
+SELECT '223e4567-e89b-12d3-a456-426614174010', 'USER_DEFAULT' ,'afd4eb70-c4e9-41b1-9034-048103d30c98', '1e6a87f0-1a7b-4f0a-9c2d-3e8b6f4a1e9c' ,'jesus2@test.com',
        '$2b$12$7hoRZfJrRKD2nIm2vHLs7OBETy.LWenXXMLKf99W8M4PUwO6KB7fu', 'ROLE_ADMIN',
        'jesus', 'admin', '+1234567890', TRUE,
        '2025-04-02 10:00:00', '2025-04-02 10:00:00'
