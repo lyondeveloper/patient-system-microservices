@@ -5,7 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.Instant;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -14,6 +16,17 @@ import java.time.Instant;
 public class PatientResponseDTO {
     private String id;
     private String userId;
-    private Instant createdAt;
-    private Instant lastModifiedDate;
+    private String gender;
+    private String firstName;
+    private String lastName;
+    private List<String> allergies;
+    private String medicalHistory;
+    private String emergencyContactPhone;
+    private String insuranceNumber;
+    private BigDecimal height;
+    private BigDecimal weight;
+    private String bloodType;
+    private String insuranceProvider;
+    private LocalDate createdAt;
+    private LocalDate lastModifiedDate;
 }

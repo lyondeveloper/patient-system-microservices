@@ -1,11 +1,11 @@
 package com.pm.accountservice.model;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.*;
-
-@Entity
 @Table(name = "tenants")
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -14,19 +14,16 @@ import java.util.*;
 @Builder
 public class Tenant extends BaseModel {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
-    @Column(unique = true, nullable = false)
+    @NotNull
     private String name;
 
-    @Column(unique = true, nullable = false)
+    @NotNull
     private String email;
 
-    @Column(name="phone_number")
+    @Column("phone_number")
     private String phoneNumber;
 
-    @ManyToOne
-    @JoinColumn(name = "address_id")
-    private Address address;
+    private Long addressId;
 }

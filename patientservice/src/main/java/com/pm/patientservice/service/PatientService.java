@@ -7,70 +7,80 @@ import com.pm.patientservice.exception.PatientNotFoundException;
 import com.pm.patientservice.mapper.PatientMapper;
 import com.pm.patientservice.model.Patient;
 import com.pm.patientservice.repository.PatientRepository;
+import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class PatientService {
     private static final Logger log = LoggerFactory.getLogger(PatientService.class);
     private final PatientRepository patientRepository;
 
-    public PatientService(PatientRepository patientRepository) {
-        this.patientRepository = patientRepository;
-    }
-
     // los servicios siempre retornan el tipo DTO que esperan el frontend
     // estos dtos tanto de ida y de regreso son claves para manejar datos relevantes al frontend o la respuesta json
-    public List<PatientResponseDTO> getPatients() {
-        List<Patient> patients = patientRepository.findAll();
-        return patients
-                .stream()
-                .map(PatientMapper::toDto)
-                .toList();
+    public Flux<PatientResponseDTO> getPatients() {
+        return patientRepository.findAll()
+                .map(PatientMapper::toDto);
     }
 
-    public PatientResponseDTO getPatientByUserId(String userId) {
-        Patient patient = patientRepository.findByUserId(UUID.fromString(userId))
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with userId: " + userId));
-        return PatientMapper.toDto(patient);
+    public Mono<PatientResponseDTO> getPatientByIdAndUserId(String patientId, String userId) {
+        return patientRepository.findByIdAndUserId(UUID.fromString(patientId), UUID.fromString(userId))
+                .switchIfEmpty(Mono.error(() -> {
+                    log.warn("Patient with id {} and userId {} not found", patientId, userId);
+                    return new PatientNotFoundException("Patient not found with patientId: " + patientId + " and userId: " + userId);
+                }))
+                .map(PatientMapper::toDto);
     }
 
-    public PatientResponseDTO getPatientById(UUID id) {
-        Patient patient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));
-        return PatientMapper.toDto(patient);
+
+    // this will only be called from user service when a user is created and type is patient
+    public Mono<Void> createPatient(PatientRequestDTO patientRequestDTO) {
+
+        var userId = UUID.fromString(patientRequestDTO.getUserId());
+
+        return patientRepository.existsByUserId(userId)
+                .flatMap((exists) -> {
+                    // returns error if patient already exists
+                    if (exists) {
+                        return Mono.error(new PatientAlreadyExistsException("A patient with this userId " + userId + " already exists"));
+                    }
+
+                    // continue the reactive chaining if not
+                    var newPatient = Patient.builder()
+                            .userId(userId)
+                            .firstName(patientRequestDTO.getFirstName())
+                            .lastName(patientRequestDTO.getLastName())
+                            .build();
+
+                    return patientRepository.save(newPatient)
+                            .doOnNext(savedPatient -> log.info("Patient created successfully with id: {}", savedPatient.getId().toString()))
+                            .then();
+                });
     }
 
-    public PatientResponseDTO createPatient(PatientRequestDTO patientRequestDTO) {
-        if (patientRepository.existsByUserId(UUID.fromString(patientRequestDTO.getUserId()))) {
-            throw new PatientAlreadyExistsException("A patient with this userId " + patientRequestDTO.getUserId() + " already exists");
-        }
+    public Mono<PatientResponseDTO> updatePatient(UUID id, PatientRequestDTO patientRequestDTO) {
+        var userId = UUID.fromString(patientRequestDTO.getUserId());
 
-        Patient newPatient = patientRepository.save(PatientMapper.toModel(patientRequestDTO));
-
-        return PatientMapper.toDto(newPatient);
+        return patientRepository.findByIdAndUserId(id, userId)
+                .switchIfEmpty(Mono.error(() -> new PatientNotFoundException("Patient not found with id " + id + " and userId " + userId)))
+                .flatMap(currentPatient -> {
+                    var updatedData = PatientMapper.toModel(patientRequestDTO);
+                    return patientRepository.save(updatedData)
+                            .doOnNext(savedPatient -> log.info("Patient updated successfully with id: {}", savedPatient.getId().toString()))
+                            .map(PatientMapper::toDto);
+                });
     }
 
-    public PatientResponseDTO updatePatient(UUID id, PatientRequestDTO patientRequestDTO) {
-        // find by id or throw exception to handle errors
-        Patient currentPatient = patientRepository.findById(id)
-                .orElseThrow(() -> new PatientNotFoundException("Patient not found with id: " + id));
-
-        if (patientRepository.existsByUserIdAndIdNot(UUID.fromString(patientRequestDTO.getUserId()), id)) {
-            throw new PatientAlreadyExistsException("A patient with this userId " + patientRequestDTO.getUserId() + " already exists");
-        }
-
-        Patient updatedPatient = patientRepository.save(currentPatient);
-
-        // always return data as a DTO
-        return PatientMapper.toDto(updatedPatient);
-    }
-
-    public void deletePatient(UUID id) {
-        patientRepository.deleteById(id);
+    public Mono<Void> deletePatient(UUID id, UUID userId) {
+        return patientRepository.findByIdAndUserId(id, userId)
+                .switchIfEmpty(Mono.error(() -> new PatientNotFoundException("Patient with id: " + id + " not found.")))
+                .flatMap(patient -> patientRepository.delete(patient)
+                        .doOnSuccess(deletedPatient -> log.info("Patient deleted successfully with id: {}", patient.getId().toString())));
     }
 }

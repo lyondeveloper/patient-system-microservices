@@ -8,8 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
-
 @Builder
 @Data
 @NoArgsConstructor
@@ -31,10 +29,13 @@ public class UserRequestDTO {
     @Size(min = 8, message = "Password must be at least 8 characters")
     private String password;
 
+    @NotBlank(message = "Date of Birth is required")
+    private String dateOfBirth;
+
     private String phoneNumber;
     private boolean isActive;
 
     private String type;
-    private String addressId;
-    private UUID tenantId;
+    private Long addressId;
+    private Long tenantId;
 }

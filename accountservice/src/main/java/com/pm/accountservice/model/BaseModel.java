@@ -1,18 +1,14 @@
 package com.pm.accountservice.model;
-import jakarta.persistence.Column;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.MappedSuperclass;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.relational.core.mapping.Column;
 
 import java.time.Instant;
-import java.util.UUID;
 
-@MappedSuperclass
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,13 +16,14 @@ import java.util.UUID;
 // basicamente detecta que hay campos de auditoria y asigna valores automaticmaente
 // es el conector entre las anotaciones @CreatedDate y @LastModifiedDate
 // y el EnableAuditoring JPAConfig
-@EntityListeners(AuditingEntityListener.class)
 public class BaseModel {
+    @NotNull
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
+    @Column("created_at")
     private Instant createdDate;
 
+    @NotNull
     @LastModifiedDate
-    @Column(name = "updated_at")
+    @Column("updated_at")
     private Instant lastModifiedDate;
 }

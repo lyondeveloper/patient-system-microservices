@@ -1,48 +1,68 @@
 package com.pm.accountservice.config;
 
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.pm.accountservice.service.UserService;
+import com.pm.accountservice.util.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.server.SecurityWebFilterChain;
+import org.springframework.security.web.server.authorization.ServerAccessDeniedHandler;
+import org.springframework.security.web.server.context.ServerSecurityContextRepository;
+import org.springframework.security.web.server.context.WebSessionServerSecurityContextRepository;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 
 @Configuration
-@EnableMethodSecurity
+@EnableWebFluxSecurity
 public class SecurityConfig {
     // este securityFilterChain es como un guardia hacia las peticiones HTTP
     // es un interceptor que se ejecuta cada vez que se haga una peticion, ejecuta el codigo
     // y basado en la logica de configuracion pues la peticion sigue su camino o no
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtUtil jwtUtil; // Asegúrate que JwtUtil esté registrado como un bean en tu aplicación
+    private final UserService userService; // Igual para UserService
+
+    public SecurityConfig(JwtUtil jwtUtil, UserService userService) {
+        this.jwtUtil = jwtUtil;
+        this.userService = userService;
+    }
+
+    @Bean
+    public ServerSecurityContextRepository securityContextRepository() {
+        return new WebSessionServerSecurityContextRepository();
+    }
+
+
+    @Bean
+    public JwtAuthenticationFilter jwtAuthenticationFilter() {
+        return new JwtAuthenticationFilter(jwtUtil, userService, securityContextRepository());
+    }
+
 
     // metodo para manejar los filtros de seguridad y autenticacion
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         // habilitando las peticiones HTTP a los endpoints libremente con permitAll()
         // prohibiendo requests como creacion de tenants o obtener un tenant si no esta autenticado
-        http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/accounts/auth/login", "/accounts/auth/register")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .csrf(AbstractHttpConfigurer::disable)
-                // agrega chains para agregar un filtro antes de que esto se ejecute y aplicar JWT validation con la clase de configuracion
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                // diciendole a spring que tome los mensajes personalizados de accessDenied
-                .exceptionHandling(exceptions ->
-                        exceptions.accessDeniedHandler(customAccessDeniedHandler()));
-        return http.build();
+
+
+        return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .authorizeExchange(auth -> auth
+                        .pathMatchers("/accounts/auth/login", "/accounts/auth/register").permitAll()
+                        .anyExchange().authenticated())
+                .securityContextRepository(securityContextRepository())
+                .addFilterBefore(jwtAuthenticationFilter(), SecurityWebFiltersOrder.AUTHORIZATION)
+                .exceptionHandling(exceptions -> exceptions.accessDeniedHandler(customAccessDeniedHandler()))
+                .build();
     }
 
     @Bean
@@ -51,18 +71,27 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AccessDeniedHandler customAccessDeniedHandler() {
-        return (request, response, ex) -> {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json");
-            response.getWriter().write("""
-                {
-                  "timestamp": "%s",
-                  "status": 403,
-                  "error": "Access Denied",
-                  "message": "You don't have permission to perform this operation, only an ADMIN can do this."
-                }
-                """.formatted(LocalDateTime.now()));
+    public ServerAccessDeniedHandler customAccessDeniedHandler() {
+        return (ServerWebExchange exchange, AccessDeniedException ex) -> {
+            // HTTP to 403
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+
+            String responseBody = """
+            {
+              "timestamp": "%s",
+              "status": 403,
+              "error": "Access Denied",
+              "message": "You don't have permission to perform this operation, only an ADMIN can do this."
+            }
+            """.formatted(LocalDateTime.now());
+
+            // Write the response body reactively
+            return exchange.getResponse()
+                    .writeWith(Mono.just(exchange.getResponse()
+                            .bufferFactory()
+                            .wrap(responseBody.getBytes())));
+
         };
     }
 }

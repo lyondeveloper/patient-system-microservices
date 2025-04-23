@@ -26,13 +26,13 @@ public class TenantController {
     }
 
     // TODO: validate correctly with exceptions
-    @Operation(summary = "Creates a new tenant")
-    @PostMapping("/create")
-    @Transactional
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<TenantResponseDTO> createTenant(@Validated({ Default.class }) @RequestBody TenantRequestDTO tenantRequestDTO) {
-        var tenantCreated = tenantService.createTenant(tenantRequestDTO);
-
-        return ResponseEntity.ok().body(tenantCreated);
-    }
+//    @Operation(summary = "Creates a new tenant")
+//    @PostMapping("/create")
+//    @Transactional
+//    @PreAuthorize("hasRole('ADMIN')")
+//    public ResponseEntity<TenantResponseDTO> createTenant(@Validated({ Default.class }) @RequestBody TenantRequestDTO tenantRequestDTO) {
+//        var tenantCreated = tenantService.createTenant(tenantRequestDTO);
+//
+//        return ResponseEntity.ok().body(tenantCreated);
+//    }
 }

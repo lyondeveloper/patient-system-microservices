@@ -1,19 +1,18 @@
 package com.pm.accountservice.mapper;
 
-import com.pm.accountservice.dto.tenant.TenantResponseDTO;
 import com.pm.accountservice.dto.user.UserRequestDTO;
 import com.pm.accountservice.dto.user.UserResponseDTO;
-import com.pm.accountservice.model.Address;
 import com.pm.accountservice.model.User;
 import com.pm.accountservice.util.UserTypes;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.Optional;
 
 public class UserMapper {
 
     public static UserResponseDTO toUserResponseDTO(User user) {
         return UserResponseDTO.builder()
-                .id(user.getId().toString())
+                .id(user.getId())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
@@ -21,12 +20,13 @@ public class UserMapper {
                 .isActive(user.isActive())
                 // address can be null, we wrap those in Optional and
                 // build it with correspondant mappers methods
-                .tenantId(user.getTenantId().toString())
+                .tenantId(user.getTenantId())
+                .dateOfBirth(user.getDateOfBirth().toString())
                 .type(String.valueOf(UserTypes.fromName(String.valueOf(user.getType()))))
-                .address(Optional.of(user)
-                        .map(User::getAddress)
-                        .map(AddressMapper::transformToDto)
-                        .orElse(null))
+//                .address(Optional.of(user)
+//                        .map(User::getAddressId)
+//                        .map(AddressMapper::transformToDto)
+//                        .orElse(null))
                 .role(String.valueOf(user.getRole()))
                 .build();
     }
@@ -35,18 +35,14 @@ public class UserMapper {
         return User.builder()
                 .firstName(userRequestDTO.getFirstName())
                 .lastName(userRequestDTO.getLastName())
+                .dateOfBirth(LocalDate.parse(userRequestDTO.getDateOfBirth()))
                 .email(userRequestDTO.getEmail())
                 .password(userRequestDTO.getPassword())
                 .phoneNumber(userRequestDTO.getPhoneNumber())
                 .isActive(userRequestDTO.isActive())
                 .tenantId(userRequestDTO.getTenantId())
                 .type(UserTypes.fromName(userRequestDTO.getType()))
-                .address(Optional.of(userRequestDTO)
-                        .map(UserRequestDTO::getAddressId)
-                        .map(addressId -> Address.builder()
-                                .id(UUID.fromString(addressId))
-                                .build())
-                        .orElse(null))
+                .addressId(userRequestDTO.getAddressId())
                 .build();
     }
 }

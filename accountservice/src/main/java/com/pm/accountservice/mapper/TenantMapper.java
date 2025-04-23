@@ -9,31 +9,31 @@ import java.util.*;
 
 public class TenantMapper {
 
-    public static TenantResponseDTO toDto(Tenant tenant) {
-        return TenantResponseDTO.builder()
-                .id(String.valueOf(tenant.getId()))
-                .name(tenant.getName())
-                .email(tenant.getEmail())
-                .phoneNumber(tenant.getPhoneNumber())
-                .address(tenant.getAddress())
-                .build();
-    }
-
-    public static Tenant toEntity(TenantRequestDTO tenantRequestDto) {
-        return Tenant.builder()
-                .name(tenantRequestDto.getName())
-                .email(tenantRequestDto.getEmail())
-                .phoneNumber(Optional.of(tenantRequestDto)
-                        .map(TenantRequestDTO::getPhoneNumber)
-                        .orElse(null))
-                .address(mapAddress(tenantRequestDto))
-                .build();
-    }
-
-    private static Address mapAddress(TenantRequestDTO tenantRequestDTO) {
-        // returning only addressId as reference
-        return Optional.ofNullable(tenantRequestDTO)
-                .map(TenantRequestDTO::getAddress)
-                .orElse(null);
-    }
+//    public static TenantResponseDTO toDto(Tenant tenant) {
+//        return TenantResponseDTO.builder()
+//                .id(String.valueOf(tenant.getId()))
+//                .name(tenant.getName())
+//                .email(tenant.getEmail())
+//                .phoneNumber(tenant.getPhoneNumber())
+//                .address(tenant.getAddressId())
+//                .build();
+//    }
+//
+//    public static Tenant toEntity(TenantRequestDTO tenantRequestDto) {
+//        return Tenant.builder()
+//                .name(tenantRequestDto.getName())
+//                .email(tenantRequestDto.getEmail())
+//                .phoneNumber(Optional.of(tenantRequestDto)
+//                        .map(TenantRequestDTO::getPhoneNumber)
+//                        .orElse(null))
+//                .address(mapAddress(tenantRequestDto))
+//                .build();
+//    }
+//
+//    private static Address mapAddress(TenantRequestDTO tenantRequestDTO) {
+//        // returning only addressId as reference
+//        return Optional.ofNullable(tenantRequestDTO)
+//                .map(TenantRequestDTO::getAddress)
+//                .orElse(null);
+//    }
 }

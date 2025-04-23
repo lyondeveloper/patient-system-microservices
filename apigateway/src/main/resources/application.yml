@@ -42,3 +42,16 @@ spring:
             - Path=/api-docs/login
           filters:
             - RewritePath=/api-docs/login,/v3/api-docs
+      globalcors:
+        cors-configurations:
+          '[/**]': # Aplica a todas las rutas
+            allowedOrigins: "http://localhost:3000"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS # ¡Importante! El navegador hace una petición OPTIONS "preflight"
+            allowedHeaders: "*" # O especifica cabeceras: Content-Type, Authorization, etc.
+            allowCredentials: true # Poner a true si envías cookies o tokens de autorización (Authorization header). ¡OJO! Si pones true, NO puedes usar "*" en allowedOrigins.
+            maxAge: 3600 # Tiempo en segundos que el navegador cachea la respuesta preflight OPTIONS (1 hora)

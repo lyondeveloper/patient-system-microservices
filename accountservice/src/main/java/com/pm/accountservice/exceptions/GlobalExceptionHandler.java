@@ -4,116 +4,88 @@ import com.pm.accountservice.exceptions.address.AddressExceptions;
 import com.pm.accountservice.exceptions.tenants.TenantNameAlreadyExistsException;
 import com.pm.accountservice.exceptions.tenants.TenantNotFoundException;
 import com.pm.accountservice.exceptions.users.CreateNewUserException;
+import com.pm.accountservice.exceptions.users.InvalidCredentialsException;
 import com.pm.accountservice.exceptions.users.UserNotFound;
 import com.pm.accountservice.exceptions.users.UserProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.support.WebExchangeBindException;
+import reactor.core.publisher.Mono;
 
 import java.nio.file.AccessDeniedException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // excepcion que tira error en validaciones
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        // un hash map es una estructura que almacena clave y valor
-        // una clave no puede repetirse pero los valores si
-        Map<String, String> errors = new HashMap<>();
+    // Manejo de errores de validación en WebFlux
+    @ExceptionHandler(WebExchangeBindException.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleValidationExceptions(WebExchangeBindException ex) {
+        Map<String, Object> errors = new HashMap<>();
 
-        // adding field and message to key value for exception
-        ex.getBindingResult().getFieldErrors().forEach(
-                error -> errors.put(error.getField(), error.getDefaultMessage()));
+        // Extraer todos los mensajes de error de validación
+        Map<String, String> validationErrors = ex.getBindingResult()
+                .getFieldErrors()
+                .stream()
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        fieldError -> Optional.ofNullable(fieldError.getDefaultMessage())
+                                .orElse("")
+                ));
 
-        return ResponseEntity.badRequest().body(errors);
+        errors.put("errors", validationErrors);
+        errors.put("message", "Validation failed");
+        errors.put("status", HttpStatus.BAD_REQUEST.value());
+
+        log.error("Validation error: {}", validationErrors);
+
+        return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors));
     }
 
-    @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<Map<String, String>> handleHttpMessageNotReadableException(MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
+    @ExceptionHandler(Exception.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleAllExceptions(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+        log.error("Unexpected error: {}", ex.getMessage());
+        response.put("message", "An unexpected error occurred: " + ex.getMessage());
+        response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        return Mono.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response));
+    }
 
-        // adding field and message to key value for exception
-        ex.getBindingResult().getFieldErrors().forEach(
-                error -> errors.put(error.getField(), error.getDefaultMessage()));
-
-        return ResponseEntity.badRequest().body(errors);
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleInvalidCredentials(InvalidCredentialsException ex) {
+        Map<String, Object> response = new HashMap<>();
+        log.error("Invalid credentials: {}", ex.getMessage());
+        response.put("message", ex.getMessage());
+        response.put("status", HttpStatus.UNAUTHORIZED.value());
+        return Mono.just(ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response));
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<String> handleAccessDenied(AccessDeniedException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Acceso denegado: " + ex.getMessage());
-    }
-
-    @ExceptionHandler(EmailAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleEmailAlreadyExistsException(EmailAlreadyExistsException ex) {
-        Map<String, String> errors = new HashMap<>();
-        // logging for dev to check error
-        log.error("Email address already exists {}", ex.getMessage());
-        errors.put("message", "Email address already exists");
-        return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(TenantNameAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleTenantNameAlreadyExistsException(TenantNameAlreadyExistsException ex) {
-        Map<String, String> errors = new HashMap<>();
-        // logging for dev to check error
-        log.error("Tenant name already exists {}", ex.getMessage());
-        errors.put("message", "Tenant name already exists");
-        return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(UserNotFound.class)
-    public ResponseEntity<Map<String, String>> handleUserNotFound(UserNotFound ex) {
-        Map<String, String> errors = new HashMap<>();
-        log.error("Error while fetching user {}", ex.getMessage());
-        errors.put("message", "This user doesnt exist or belong to this tenant");
-        return ResponseEntity.badRequest().body(errors);
+    public Mono<ResponseEntity<Map<String, Object>>> handleAccessDenied(AccessDeniedException ex) {
+        Map<String, Object> response = new HashMap<>();
+        log.error("Access denied: {}", ex.getMessage());
+        response.put("message", "Access Denied: " + ex.getMessage());
+        response.put("status", HttpStatus.FORBIDDEN.value());
+        return Mono.just(ResponseEntity.status(HttpStatus.FORBIDDEN).body(response));
     }
 
     @ExceptionHandler(CreateNewUserException.class)
-    public ResponseEntity<Map<String, String>> handleCreateNewUserException(CreateNewUserException ex) {
-        Map<String, String> errors = new HashMap<>();
-        log.error("Error while creating a new user {}", ex.getMessage());
-        errors.put("message", "Error while creating a new user");
-        return ResponseEntity.badRequest().body(errors);
+    public Mono<ResponseEntity<Map<String, Object>>> handleCreateNewUserExceptions(CreateNewUserException ex) {
+        Map<String, Object> response = new HashMap<>();
+        log.error("User Creating failed: {}", ex.getMessage());
+        response.put("message", ex.getMessage());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
     }
-
-    @ExceptionHandler(TenantNotFoundException.class)
-    public ResponseEntity<Map<String, String>> handleTenantNotFoundException(TenantNotFoundException ex) {
-        Map<String, String> errors = new HashMap<>();
-        log.error("Error while fetching this tenant {}", ex.getMessage());
-        errors.put("message", "Tenant does not exist with this ID");
-        return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(UserProcessingException.class)
-    public ResponseEntity<Map<String, String>> handleUserProcessingException(UserProcessingException ex) {
-        Map<String, String> errors = new HashMap<>();
-        log.error("Error while processing a new user {}", ex.getMessage());
-        errors.put("message", ex.getMessage());
-        return ResponseEntity.badRequest().body(errors);
-    }
-
-    @ExceptionHandler(AddressExceptions.class)
-    public ResponseEntity<Map<String, String>> handleAddressExceptions(AddressExceptions ex) {
-        Map<String, String> errors = new HashMap<>();
-        log.error("Error while creating the address {}", ex.getMessage());
-        errors.put("message", ex.getMessage());
-        return ResponseEntity.badRequest().body(errors);
-    }
-
-    // add
-    // get tenant error exception
-    // get user error exception
-    // get address error exception
 }

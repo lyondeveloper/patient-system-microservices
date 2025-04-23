@@ -23,18 +23,18 @@ public class Patient extends BaseModel {
     @Column(name = "user_id", nullable = false, unique = true)
     private UUID userId;
 
-    @Column(name = "blood_type", nullable = false)
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "blood_type")
     private String bloodType;
-    @Column(nullable = false)
+
     private String gender;
 
     private BigDecimal weight;
     private BigDecimal height;
-
-    @Column(name = "registered_date", nullable = false)
-    private LocalDate registeredDate;
-    @Column(name = "date_of_birth", nullable = false)
-    private LocalDate dateOfBirth;
     // note: convert this to another model
     // maybe to take better the history if there are more fields
     // i have an idea talking with glay, but leave it like that
@@ -49,7 +49,7 @@ public class Patient extends BaseModel {
     @CollectionTable(name = "patient_allergies", joinColumns = @JoinColumn(name = "patient_id"))
     private List<String> allergies;
 
-    @Column(name = "emergency_contact_phone", nullable = false)
+    @Column(name = "emergency_contact_phone")
     private String emergencyContactPhone;
 
     @Column(name = "insurance_provider")

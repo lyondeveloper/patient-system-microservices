@@ -2,58 +2,71 @@ package com.pm.accountservice.model;
 
 import com.pm.accountservice.util.UserRoles;
 import com.pm.accountservice.util.UserTypes;
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.time.LocalDate;
 
-@Entity
 @Table(name="users")
 @EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends BaseModel {
+public class User extends BaseModel implements Persistable<Long> {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Transient
+    private boolean isNew = true;
+
+    @NotNull
     private String email;
 
-    @Column(nullable = false)
+    @NotNull
     private String password;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @NotNull
     @Builder.Default
     private UserTypes type = UserTypes.USER_DEFAULT;
 
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
+    @NotNull
     @Builder.Default
     private UserRoles role = UserRoles.ROLE_USER;
 
-    @Column(name = "tenant_id", nullable = false)
-    private UUID tenantId;
+    @Column("tenant_id")
+    private Long tenantId;
 
-    @Column(name="first_name", nullable = false)
+    @Column("first_name")
     private String firstName;
 
-    @Column(name="last_name", nullable = false)
+    @Column("last_name")
     private String lastName;
 
-    @Column(name="phone_number")
+    @Column("phone_number")
     private String phoneNumber;
 
-    @Column(name="is_active")
+    @Column("is_active")
     @Builder.Default
     private boolean isActive = true;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "address_id")
-    private Address address;
+    @Column("date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column("address_id")
+    private Long addressId;
+
+    @Override
+    public boolean isNew() {
+        return isNew;
+    }
+
+    public void markNotNew() {
+        this.isNew = false;
+    }
 }

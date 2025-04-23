@@ -1,7 +1,6 @@
 package com.pm.accountservice.dto.user;
 
 import com.pm.accountservice.dto.address.AddressResponseDTO;
-import com.pm.accountservice.dto.tenant.TenantResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserResponseDTO {
-    private String id;
+    private Long id;
     private String firstName;
     private String lastName;
     private String role;
@@ -20,7 +19,8 @@ public class UserResponseDTO {
     private String type;
     private String createdDate;
     private boolean isActive;
+    private String dateOfBirth;
     private String email;
-    private String tenantId;
+    private Long tenantId;
     private AddressResponseDTO address;
 }

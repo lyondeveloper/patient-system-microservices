@@ -1,12 +1,8 @@
 package com.pm.accountservice.repository;
 
 import com.pm.accountservice.model.Tenant;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Mono;
 
-import java.util.Optional;
-import java.util.UUID;
-
-public interface TenantRepository extends JpaRepository<Tenant, UUID> {
-    boolean existsByEmail(String email);
-    boolean existsByName(String name);
+public interface TenantRepository extends ReactiveCrudRepository<Tenant, Long> {
 }

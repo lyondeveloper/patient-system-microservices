@@ -33,28 +33,11 @@ public class PatientController {
         return ResponseEntity.ok().body(patients);
     }
 
-    @GetMapping("/{id}")
-    @Operation(summary = "Get single patient")
-    public ResponseEntity<PatientResponseDTO> getSinglePatient(@PathVariable UUID id) {
-        PatientResponseDTO patient = patientService.getPatientById(id);
+    @GetMapping("/{patientId}/byUserId/{userId}")
+    @Operation(summary = "Get single patient by userId")
+    public ResponseEntity<PatientResponseDTO> getPatientByUserId(@PathVariable String userId, @PathVariable String patientId) {
+        PatientResponseDTO patient = patientService.getPatientByIdAndUserId(patientId, userId);
         return ResponseEntity.ok().body(patient);
-    }
-
-    @GetMapping("/byUserId/{userId}")
-    @Operation(summary = "Get single patient")
-    public ResponseEntity<PatientResponseDTO> getPatientByUserId(@PathVariable String userId) {
-        PatientResponseDTO patient = patientService.getPatientByUserId(userId);
-        return ResponseEntity.ok().body(patient);
-    }
-
-    @PostMapping("/create")
-    @Operation(summary = "Create a new patient")
-    // validated aca con el grupo para que el controlador sepa que no requerimos que chequee la validacion para registeredDate notBlank ya que
-    // no queremos que al actualizar un paciente, este campo vuelva a ser actualizado
-    public ResponseEntity<PatientResponseDTO> createPatient(@Validated({ Default.class, CreatePatientValidationGroup.class }) @RequestBody PatientRequestDTO patientRequestDTO) {
-        PatientResponseDTO newPatient = patientService.createPatient(patientRequestDTO);
-
-        return ResponseEntity.ok().body(newPatient);
     }
 
     @PutMapping("/{id}")

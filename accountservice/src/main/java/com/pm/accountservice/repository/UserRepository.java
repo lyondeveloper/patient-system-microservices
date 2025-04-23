@@ -1,32 +1,29 @@
 package com.pm.accountservice.repository;
 
 import com.pm.accountservice.model.User;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
-
-public interface UserRepository extends JpaRepository<User, UUID> {
-    Optional<User> findByEmail(String email);
-    Optional<User> findByEmailAndTenantId(
+public interface UserRepository extends ReactiveCrudRepository<User, Long> {
+    Mono<User> findByEmail(String email);
+    @Query("SELECT u.* FROM users u WHERE u.email = :email AND u.tenant_id = :tenantId")
+    Mono<User> findByEmailAndTenantId(
             @Param("email") String email,
-            @Param("tenantId") UUID tenantId
+            @Param("tenantId") Long tenantId
     );
-    boolean existsByEmail(String email);
 
-    @Query("SELECT u FROM User u LEFT JOIN FETCH u.address")
-    List<User> findAllWithRelationsByTenantId(UUID tenantId);
+    @Query("SELECT u.*, a.* FROM users u LEFT JOIN address a ON u.address_id = a.id WHERE U.tenant_id = :tenantId")
+    Flux<User> findAllWithRelationsByTenantId(Long tenantId);
 
-    @Query("SELECT DISTINCT u FROM User u " +
-            "LEFT JOIN FETCH u.address " +
-            "WHERE u.id = :userId AND u.tenantId = :tenantId")
-    Optional<User> findByIdAndTenantIdWithRelations(
-            @Param("userId") UUID userId,
-            @Param("tenantId") UUID tenantId);
+    @Query("SELECT u.*, a.* FROM users u LEFT JOIN address a ON u.address_id = a.id WHERE u.id = :userId AND u.tenant_id = :tenantId")
+    Mono<User> findByIdAndTenantIdWithRelations(
+            @Param("userId") Long userId,
+            @Param("tenantId") Long tenantId);
 
-    boolean existsByIdAndTenantId(UUID id, UUID tenantId);
+    Mono<Boolean> existsByEmailAndTenantId(String email, Long tenantId);
+    Mono<Boolean> existsByIdAndTenantId(Long id, Long tenantId);
 }
 

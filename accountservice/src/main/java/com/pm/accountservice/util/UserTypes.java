@@ -3,6 +3,7 @@ package com.pm.accountservice.util;
 public enum UserTypes {
     USER_PATIENT("USER_PATIENT"),
     USER_DEFAULT("USER_DEFAULT"),
+    USER_NURSE("USER_NURSE"),
     USER_DOCTOR("USER_DOCTOR");
 
     private final String userType;

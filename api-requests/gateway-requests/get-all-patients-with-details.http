@@ -1,0 +1,5 @@
+### GET all patient details
+GET http://localhost:4004/api/gateway/patients/all-details
+Content-Type: application/json
+Authorization: Bearer {{token}}
+###
