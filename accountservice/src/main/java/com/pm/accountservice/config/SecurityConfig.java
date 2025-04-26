@@ -53,8 +53,6 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         // habilitando las peticiones HTTP a los endpoints libremente con permitAll()
         // prohibiendo requests como creacion de tenants o obtener un tenant si no esta autenticado
-
-
         return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(auth -> auth
                         .pathMatchers("/accounts/auth/login", "/accounts/auth/register").permitAll()

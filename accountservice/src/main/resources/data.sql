@@ -13,14 +13,8 @@ CREATE TABLE IF NOT EXISTS "tenants"
     created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
---
---
--- INSERT INTO tenants (name, email, phone_number)
--- VALUES (
---            'Empresa A',
---            'contacto@empresa-a.com',
---            '123-456-7890'
---        ) ON CONFLICT (email) DO NOTHING;
+
+
 
 
 CREATE TABLE IF NOT EXISTS address (
@@ -30,7 +24,8 @@ CREATE TABLE IF NOT EXISTS address (
                                        state VARCHAR(100) NOT NULL,
                                        country VARCHAR(100) NOT NULL,
                                        zip_code VARCHAR(20) NOT NULL,
-                                       tenant_id BIGINT NOT NULL
+                                       created_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                                       updated_at   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 
@@ -51,7 +46,7 @@ CREATE TABLE IF NOT EXISTS address (
 CREATE TABLE IF NOT EXISTS "users" (
                                        id BIGINT PRIMARY KEY DEFAULT nextval('users_id_seq')::BIGINT,
                                        email VARCHAR(255) UNIQUE NOT NULL,
-                                       date_of_birth DATE,
+                                       date_of_birth DATE NOT NULL,
                                        first_name VARCHAR(255),
                                        last_name VARCHAR(255),
                                        password VARCHAR(255) NOT NULL,
@@ -64,30 +59,3 @@ CREATE TABLE IF NOT EXISTS "users" (
                                        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
                                        updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
-
--- INSERT INTO "users" (
---     email,
---     first_name,
---     last_name,
---     password,
---     role,
---     type,
---     phone_number,
---     is_active,
---     tenant_id
--- )
--- SELECT
---     'jesus@admin.com',
---     'Admin',
---     'Principal',
---     '$2a$10$dJsfDixciWPD81B0S3CTs.FAc6WOgjaCk5jnU5OUbsqiYlG3fymry',  -- Contraseña encriptada 'admin123'
---     'ROLE_ADMIN',  -- Rol de administrador
---     'USER_ADMIN',  -- Tipo de usuario administrador
---     '555-123-4567',
---     TRUE,
---     (SELECT id FROM tenants WHERE email = 'contacto@empresa-a.com')
--- WHERE NOT EXISTS (
---     SELECT 1 FROM "users" WHERE email = 'jesus@admin.com'
--- );
-
-

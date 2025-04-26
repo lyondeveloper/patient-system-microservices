@@ -43,22 +43,16 @@ public class UserController {
 
     @Operation(summary = "Get all users")
     @GetMapping
-    public Flux<ResponseEntity<UserResponseDTO>> getAllUsersByTenantId() {
-        return userService.findAllUsersByTenantId()
-                .map(ResponseEntity::ok)
-                // onErrorResume captura el error y detiene el flujo reactivo
-                // y nos permite loggear o hacer acciones secundarias
-                .onErrorResume(error -> {
-                    log.error("Unexpected 500 server error: {}", error.getMessage());
-                    return Flux.just(ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build());
-                });
+    public ResponseEntity<Flux<UserResponseDTO>> getAllUsersByTenantId() {
+        return ResponseEntity.ok(userService.findAllUsersByTenantId());
     }
 
-//    @Operation(summary = "Get user by id")
-//    @GetMapping("/{userId}")
-//    public Mono<ResponseEntity<UserResponseDTO>> getUserById(@PathVariable String userId) {
-//        return userService
-//    }
+    @Operation(summary = "Get user by id")
+    @GetMapping("/{id}")
+    public Mono<ResponseEntity<UserResponseDTO>> getUserById(@PathVariable String id) {
+        return userService.getUserById(id)
+                .map(ResponseEntity::ok);
+    }
 
     @Operation(summary = "Create a user (Only ADMIN)")
     @PostMapping("/create")

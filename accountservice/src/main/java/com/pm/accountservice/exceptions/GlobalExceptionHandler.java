@@ -88,4 +88,13 @@ public class GlobalExceptionHandler {
         response.put("status", HttpStatus.BAD_REQUEST.value());
         return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
     }
+
+    @ExceptionHandler(AddressExceptions.class)
+    public Mono<ResponseEntity<Map<String, Object>>> handleAddressExceptions(CreateNewUserException ex) {
+        Map<String, Object> response = new HashMap<>();
+        log.error("Address exception triggered: {}", ex.getMessage());
+        response.put("message", ex.getMessage());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        return Mono.just(ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response));
+    }
 }

@@ -1,5 +1,5 @@
 ### GET USER BY ID
-GET http://localhost:4004/api/accounts/users/223e4567-e89b-12d3-a456-426614174006
+GET http://localhost:4004/api/accounts/users/11
 Content-Type: application/json
 Authorization: Bearer {{token}}
 ###

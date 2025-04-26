@@ -4,9 +4,6 @@ import com.pm.accountservice.util.UserRoles;
 import com.pm.accountservice.util.UserTypes;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Transient;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -18,13 +15,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User extends BaseModel implements Persistable<Long> {
-    @Id
-    private Long id;
-
-    @Transient
-    private boolean isNew = true;
-
+public class User extends BaseModel{
     @NotNull
     private String email;
 
@@ -60,13 +51,4 @@ public class User extends BaseModel implements Persistable<Long> {
 
     @Column("address_id")
     private Long addressId;
-
-    @Override
-    public boolean isNew() {
-        return isNew;
-    }
-
-    public void markNotNew() {
-        this.isNew = false;
-    }
 }

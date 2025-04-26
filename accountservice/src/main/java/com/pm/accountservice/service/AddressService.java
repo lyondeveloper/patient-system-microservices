@@ -25,32 +25,11 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final CommonService commonService;
 
-    public Flux<AddressResponseDTO> getAllAddresses() {
-        return commonService.getCurrentTenantId()
-                .flatMapMany(tenantId -> addressRepository.findAllByTenantId(Long.valueOf(tenantId))
-                            .map(AddressMapper::transformToDto)
-                            .onErrorResume((ex) -> {
-                                log.error("Error on retrieving addresses: {}", ex.getMessage());
-                                return Flux.error(new AddressExceptions("Unexpected Error"));
-                            }))
-                .onErrorResume((ex) -> {
-                    log.error("Error on retrieving tenantId: {}", ex.getMessage());
-                    return Flux.error(new TenantNotFoundException("No tenant available in security context"));
-                });
-    }
-
     public Mono<AddressResponseDTO> getAddressById(Long id) {
-        return commonService.getCurrentTenantId()
-                .flatMap(tenantId -> addressRepository.findByIdAndTenantId(id, Long.valueOf(tenantId))
+        return addressRepository.findById(id)
                 .map(AddressMapper::transformToDto)
-                .onErrorResume((ex) -> {
-                    log.error("Error on retrieving addresses: {}", ex.getMessage());
-                    return Mono.error(new AddressExceptions("Unexpected Error"));
-                }))
-                .onErrorResume((ex) -> {
-                    log.error("Error on retrieving tenantId: {}", ex.getMessage());
-                    return Mono.error(new TenantNotFoundException("No tenant available in security context"));
-                });
+                .switchIfEmpty(Mono.error(() -> new AddressExceptions("Address not found")))
+                .doOnError((ex) -> log.error("Address not found with id {}: {}", id, ex.getMessage()));
     }
 
     public Mono<AddressResponseDTO> createAddress(AddressRequestDTO addressRequestDTO) {
@@ -66,6 +45,7 @@ public class AddressService {
                             payloadMapped.getZipCode()
                     ).flatMap(exists -> {
                         if (exists) {
+                            log.error("Address already exists");
                             return Mono.error(new AddressExceptions("Address already exists"));
                         }
 

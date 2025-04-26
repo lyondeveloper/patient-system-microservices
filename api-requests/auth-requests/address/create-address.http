@@ -8,6 +8,6 @@ Authorization: Bearer {{token}}
   "zipCode": "4019",
   "state": "Zulia",
   "city": "Ojeda",
-  "street": "Calle Piar2"
+  "street": "Calle Piar"
 }
 ###

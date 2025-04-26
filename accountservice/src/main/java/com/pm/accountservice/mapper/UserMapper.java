@@ -23,10 +23,6 @@ public class UserMapper {
                 .tenantId(user.getTenantId())
                 .dateOfBirth(user.getDateOfBirth().toString())
                 .type(String.valueOf(UserTypes.fromName(String.valueOf(user.getType()))))
-//                .address(Optional.of(user)
-//                        .map(User::getAddressId)
-//                        .map(AddressMapper::transformToDto)
-//                        .orElse(null))
                 .role(String.valueOf(user.getRole()))
                 .build();
     }

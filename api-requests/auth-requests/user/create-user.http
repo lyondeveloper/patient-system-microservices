@@ -4,10 +4,11 @@ Content-type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "email":"jesus41@gmail.com",
+  "email":"sam2@gmail.com",
   "password": "12345678",
   "firstName": "first_new",
   "lastName": "last_new",
   "type": "USER_PATIENT",
-  "dateOfBirth": "1999-10-28"
+  "dateOfBirth": "1999-10-28",
+  "addressId": 1
 }
