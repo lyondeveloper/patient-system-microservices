@@ -43,12 +43,6 @@ public class UserEventCreatedConsumerService {
     }
 
     private Mono<Void> processUserEventCreated(ReceiverRecord<String, String> record) {
-        if (!USER_CREATED_TOPIC.equals(record.topic())) {
-            log.info("Skipping message from topic: {}", record.topic());
-            record.receiverOffset().acknowledge();
-            return Mono.empty();
-        }
-
         return Mono.fromCallable(() -> {
             log.info("Received user created event: Topic={}, Partition={}, Offset={}, Key={}, Value={}",
                     record.topic(), record.partition(), record.offset(), record.key(), record.value());
@@ -73,11 +67,6 @@ public class UserEventCreatedConsumerService {
 
                     return patientService.createPatient(request)
                             .onErrorResume(e -> {
-                                if (e.getMessage() != null && e.getMessage().contains("already exists")) {
-                                    log.warn("Patient already exists, skipping record");
-                                    record.receiverOffset().acknowledge();
-                                    return Mono.empty();
-                                }
                                 log.error("Error creating patient: {}", e.getMessage());
                                 return Mono.error(new Exception("Error creating patient: " + e.getMessage()));
                             });
