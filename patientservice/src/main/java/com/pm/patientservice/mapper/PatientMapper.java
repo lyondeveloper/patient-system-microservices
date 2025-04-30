@@ -10,12 +10,10 @@ import java.util.Optional;
 public class PatientMapper {
     public static PatientResponseDTO toDto(Patient patient) {
         return PatientResponseDTO.builder()
-                .id(patient.getId().toString())
-                .userId(patient.getUserId().toString())
+                .id(patient.getId())
+                .userId(patient.getUserId())
                 .firstName(patient.getFirstName())
                 .lastName(patient.getLastName())
-                .createdAt(LocalDate.from(patient.getCreatedDate()))
-                .lastModifiedDate(LocalDate.from(patient.getLastModifiedDate()))
                 .build();
     }
 
@@ -45,9 +43,9 @@ public class PatientMapper {
                 .insuranceProvider(Optional.ofNullable(patientRequestDTO)
                         .map(PatientRequestDTO::getInsuranceProvider)
                         .orElse(null))
-                .allergies(Optional.ofNullable(patientRequestDTO)
-                        .map(PatientRequestDTO::getAllergies)
-                        .orElse(null))
+//                .allergies(Optional.ofNullable(patientRequestDTO)
+//                        .map(PatientRequestDTO::getAllergies)
+//                        .orElse(null))
                 .build();
     }
 }

@@ -49,7 +49,7 @@ public class AuthController {
     // to check if its valid token
     @Operation(summary = "Validates the generated token")
     @GetMapping("/validateCurrentToken")
-    public Mono<ResponseEntity<Object>> validateToken(@RequestHeader("Authorization") String authHeader) {
+    public Mono<ResponseEntity<Object>> validateToken() {
         // Mono.justOrEmpty creates a reactive flow
         // that can contain a value or be empty
         // depending the value you pass on

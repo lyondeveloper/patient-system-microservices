@@ -1,59 +1,55 @@
 package com.pm.patientservice.model;
 
-import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.UUID;
 
-@Entity
 @Table(name = "patients")
+@EqualsAndHashCode(callSuper = true)
 @Data
 @Builder
-@EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Patient extends BaseModel {
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @NotNull
+    @Column("user_id")
+    private Long userId;
 
-    @Column(name = "user_id", nullable = false, unique = true)
-    private UUID userId;
-
-    @Column(name = "first_name", nullable = false)
+    @NotNull
+    @Column("first_name")
     private String firstName;
-    @Column(name = "last_name", nullable = false)
+    @NotNull
+    @Column("last_name")
     private String lastName;
 
-    @Column(name = "blood_type")
+    @Column("blood_type")
     private String bloodType;
 
     private String gender;
-
     private BigDecimal weight;
     private BigDecimal height;
     // note: convert this to another model
     // maybe to take better the history if there are more fields
     // i have an idea talking with glay, but leave it like that
-    @Column(name = "medical_history")
+    @Column("medical_history")
     private String medicalHistory;
 
     // se necesita guardar la lista de strings en una tabla aparte para escabilidad
     // se pueden agregar muchas alergias y es preferible
     // JPA no permite hacerlo sin convertirlo a un String deserializado
     // o hacer este approach con ElementCollection
-    @ElementCollection
-    @CollectionTable(name = "patient_allergies", joinColumns = @JoinColumn(name = "patient_id"))
-    private List<String> allergies;
+//    @ElementCollection
+//    @CollectionTable(name = "patient_allergies", joinColumns = @JoinColumn(name = "patient_id"))
+//    private List<String> allergies;
 
-    @Column(name = "emergency_contact_phone")
+    @Column("emergency_contact_phone")
     private String emergencyContactPhone;
 
-    @Column(name = "insurance_provider")
+    @Column("insurance_provider")
     private String insuranceProvider;
-    @Column(name = "insurance_number")
+    @Column("insurance_number")
     private String insuranceNumber;
 }

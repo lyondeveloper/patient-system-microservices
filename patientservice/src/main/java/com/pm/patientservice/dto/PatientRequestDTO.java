@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PatientRequestDTO {
     @NotBlank(groups=CreatePatientValidationGroup.class, message = "A user to attach this patient to is required")
-    private String userId;
+    private Long userId;
     @NotBlank(groups=CreatePatientValidationGroup.class, message = "First name is required")
     private String firstName;
     @NotBlank(groups=CreatePatientValidationGroup.class, message = "Last name is required")
@@ -27,7 +27,7 @@ public class PatientRequestDTO {
     private String gender;
     private String bloodType;
     private String emergencyContactPhone;
-    private List<String> allergies;
+    // private List<String> allergies;
     private String medicalHistory;
     private String insuranceProvider;
     private String insuranceNumber;

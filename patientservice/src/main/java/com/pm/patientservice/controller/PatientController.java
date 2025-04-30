@@ -25,35 +25,35 @@ public class PatientController {
         this.patientService = patientService;
     }
 
-    @GetMapping
-    @Operation(summary = "Get Patients")
-    public ResponseEntity<List<PatientResponseDTO>> getPatients() {
-        List<PatientResponseDTO> patients = patientService.getPatients();
+//    @GetMapping
+//    @Operation(summary = "Get Patients")
+//    public ResponseEntity<List<PatientResponseDTO>> getPatients() {
+//        List<PatientResponseDTO> patients = patientService.getPatients();
+//
+//        return ResponseEntity.ok().body(patients);
+//    }
+//
+//    @GetMapping("/{patientId}/byUserId/{userId}")
+//    @Operation(summary = "Get single patient by userId")
+//    public ResponseEntity<PatientResponseDTO> getPatientByUserId(@PathVariable String userId, @PathVariable String patientId) {
+//        PatientResponseDTO patient = patientService.getPatientByIdAndUserId(patientId, userId);
+//        return ResponseEntity.ok().body(patient);
+//    }
 
-        return ResponseEntity.ok().body(patients);
-    }
-
-    @GetMapping("/{patientId}/byUserId/{userId}")
-    @Operation(summary = "Get single patient by userId")
-    public ResponseEntity<PatientResponseDTO> getPatientByUserId(@PathVariable String userId, @PathVariable String patientId) {
-        PatientResponseDTO patient = patientService.getPatientByIdAndUserId(patientId, userId);
-        return ResponseEntity.ok().body(patient);
-    }
-
-    @PutMapping("/{id}")
-    @Operation(summary = "Update a patient")
-    // path variable agarra el id o el parametro de la URL
-    public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable UUID id, @Validated({Default.class}) @RequestBody PatientRequestDTO patientRequestDTO) {
-        PatientResponseDTO updatedPatient = patientService.updatePatient(id, patientRequestDTO);
-        return ResponseEntity.ok().body(updatedPatient);
-    }
-
-    @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a patient")
-    public ResponseEntity<Void> deletePatient(@PathVariable UUID id) {
-        patientService.deletePatient(id);
-        return ResponseEntity.noContent().build();
-    }
+//    @PutMapping("/{id}")
+//    @Operation(summary = "Update a patient")
+//    // path variable agarra el id o el parametro de la URL
+//    public ResponseEntity<PatientResponseDTO> updatePatient(@PathVariable UUID id, @Validated({Default.class}) @RequestBody PatientRequestDTO patientRequestDTO) {
+//        PatientResponseDTO updatedPatient = patientService.updatePatient(id, patientRequestDTO);
+//        return ResponseEntity.ok().body(updatedPatient);
+//    }
+//
+//    @DeleteMapping("/{id}")
+//    @Operation(summary = "Delete a patient")
+//    public ResponseEntity<Void> deletePatient(@PathVariable UUID id) {
+//        patientService.deletePatient(id);
+//        return ResponseEntity.noContent().build();
+//    }
 }
 
 

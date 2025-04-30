@@ -10,9 +10,9 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCreatedEvent extends BaseEvent {
-    private String userId;
+    private Long userId;
+    private Long tenantId;
     private String userType;
     private String firstName;
     private String lastName;
-    private String tenantId;
 }

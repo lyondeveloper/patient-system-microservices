@@ -1,4 +1,4 @@
-package com.pm.accountservice.config;
+package com.pm.patientservice.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;

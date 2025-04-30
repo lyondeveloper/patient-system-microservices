@@ -9,10 +9,9 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatientCreatedEventProducer extends BaseEvent {
-    private String patientId;
+public class PatientCreatedEvent extends BaseEvent {
+    private String id;
     private String userId;
     private String firstName;
     private String lastName;
-    private String gender;
 }

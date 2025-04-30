@@ -14,12 +14,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PatientResponseDTO {
-    private String id;
-    private String userId;
+    private Long id;
+    private Long userId;
     private String gender;
     private String firstName;
     private String lastName;
-    private List<String> allergies;
+    // private List<String> allergies;
     private String medicalHistory;
     private String emergencyContactPhone;
     private String insuranceNumber;
