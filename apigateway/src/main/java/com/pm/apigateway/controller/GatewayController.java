@@ -16,12 +16,12 @@ public class GatewayController {
         this.gatewayService = gatewayService;
     }
 
-    @GetMapping("/patients/patient-details/{userId}")
-    public Mono<PatientDetailsPayload> getPatientDetails(@PathVariable String userId,
+    @GetMapping("/patients/{patientId}/patient-details")
+    public Mono<PatientDetailsPayload> getPatientDetails(@PathVariable String patientId,
                                                          @RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
         // retrieve token from authorization header
         String token = authHeader.substring(7);
-        return gatewayService.getPatientDetails(userId, token);
+        return gatewayService.getPatientDetails(patientId, token);
     }
 
     @GetMapping("/patients/all-details")

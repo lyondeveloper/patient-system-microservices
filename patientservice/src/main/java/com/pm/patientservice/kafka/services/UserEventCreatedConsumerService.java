@@ -3,12 +3,10 @@ package com.pm.patientservice.kafka.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pm.patientservice.dto.PatientRequestDTO;
-import com.pm.patientservice.dto.PatientResponseDTO;
 import com.pm.patientservice.kafka.events.consumers.UserCreatedEvent;
 import com.pm.patientservice.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -29,8 +27,6 @@ public class UserEventCreatedConsumerService {
     private Disposable subscription;
     private final PatientService patientService;
 
-    private final String USER_CREATED_TOPIC = "userCreatedSnapshot";
-
     @EventListener(ApplicationStartedEvent.class)
     public void onStart() {
         log.info("Starting kafka consumer for UserCreated event...");
@@ -43,19 +39,7 @@ public class UserEventCreatedConsumerService {
     }
 
     private Mono<Void> processUserEventCreated(ReceiverRecord<String, String> record) {
-        return Mono.fromCallable(() -> {
-            log.info("Received user created event: Topic={}, Partition={}, Offset={}, Key={}, Value={}",
-                    record.topic(), record.partition(), record.offset(), record.key(), record.value());
-
-            try {
-                var userEvent = objMapper.readValue(record.value(), UserCreatedEvent.class);
-                log.info("UserCreated event received: {}", userEvent);
-                return userEvent;
-            } catch(JsonProcessingException e) {
-                log.error("Error deserializing event value [{}]: {}. Skipping record.", record.value(), e.getMessage());
-                throw e;
-            }
-        })
+        return Mono.fromCallable(() -> deserializeEvent(record))
                 .filter(event -> Objects.equals(event.getUserType(), "USER_PATIENT"))
                 .flatMap(event -> {
                     log.info("User is type patient, initiating patient creation process for userId: {}", event.getUserId());
@@ -74,6 +58,20 @@ public class UserEventCreatedConsumerService {
                 .doOnSuccess(unused -> record.receiverOffset().acknowledge())
                 .doOnError(error -> log.error("Unexpected error processing record [key={}]: {}. Skipping record.", record.key(), error.getMessage(), error))
                 .then();
+    }
+
+    private UserCreatedEvent deserializeEvent(ReceiverRecord<String, String> record) {
+        log.info("Received user created event: Topic={}, Partition={}, Offset={}, Key={}, Value={}",
+                record.topic(), record.partition(), record.offset(), record.key(), record.value());
+
+        try {
+            var userEvent = objMapper.readValue(record.value(), UserCreatedEvent.class);
+            log.info("UserCreated event received: {}", userEvent);
+            return userEvent;
+        } catch(JsonProcessingException e) {
+            log.error("Error deserializing event value [{}]: {}. Skipping record.", record.value(), e.getMessage());
+            throw new RuntimeException(e);
+        }
     }
 
     public void stopConsumer() {

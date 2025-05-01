@@ -1,5 +1,5 @@
 ### GET patient details
-GET http://localhost:4004/api/gateway/patients/patient-details/94fa852a-4d16-498d-a00e-f37a0eeda911
+GET http://localhost:4004/api/gateway/patients/6/patient-details
 Content-Type: application/json
 Authorization: Bearer {{token}}
 ###

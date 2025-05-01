@@ -37,9 +37,7 @@ public class PatientEventCreatedProducerService {
             );
 
             return kafkaSender.send(Mono.just(record))
-                    .doOnNext(result -> {
-                        log.info("Topic message send successfully: {}", result.recordMetadata());
-                    })
+                    .doOnNext(result -> log.info("Topic message send successfully: {}", result.recordMetadata()))
                     .doOnError(e -> log.error("Error sending topic message: {}", e.getMessage()))
                     .then();
         } catch(JsonProcessingException e) {

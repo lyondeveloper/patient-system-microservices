@@ -3,6 +3,7 @@ package com.pm.patientservice.service;
 import com.pm.patientservice.dto.PatientRequestDTO;
 import com.pm.patientservice.dto.PatientResponseDTO;
 import com.pm.patientservice.exception.PatientAlreadyExistsException;
+import com.pm.patientservice.exception.PatientNotFoundException;
 import com.pm.patientservice.kafka.events.producers.PatientCreatedEvent;
 import com.pm.patientservice.kafka.services.PatientEventCreatedProducerService;
 import com.pm.patientservice.mapper.PatientMapper;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -21,26 +23,23 @@ public class PatientService {
     private final PatientRepository patientRepository;
     private final PatientEventCreatedProducerService patientEventCreatedProducerService;
 
-    // los servicios siempre retornan el tipo DTO que esperan el frontend
-    // estos dtos tanto de ida y de regreso son claves para manejar datos relevantes al frontend o la respuesta json
-//    public Flux<PatientResponseDTO> getPatients() {
-//        return patientRepository.findAll()
-//                .map(PatientMapper::toDto);
-//    }
-//
-//    public Mono<PatientResponseDTO> getPatientByIdAndUserId(String patientId, String userId) {
-//        return patientRepository.findByIdAndUserId(UUID.fromString(patientId), UUID.fromString(userId))
-//                .switchIfEmpty(Mono.error(() -> {
-//                    log.warn("Patient with id {} and userId {} not found", patientId, userId);
-//                    return new PatientNotFoundException("Patient not found with patientId: " + patientId + " and userId: " + userId);
-//                }))
-//                .map(PatientMapper::toDto);
-//    }
+    public Flux<PatientResponseDTO> getPatients() {
+        return patientRepository.findAll()
+                .map(PatientMapper::toDto);
+    }
+
+    public Mono<PatientResponseDTO> getPatientById(String patientId) {
+        return patientRepository.findById(Long.valueOf(patientId))
+                .switchIfEmpty(Mono.error(() -> {
+                    log.warn("Patient with id {} not found", patientId);
+                    return new PatientNotFoundException("Patient not found with patientId: " + patientId);
+                }))
+                .map(PatientMapper::toDto);
+    }
 
 
     // this will only be called from user service when a user is created and type is patient
     public Mono<PatientResponseDTO> createPatient(PatientRequestDTO patientRequestDTO) {
-
         var userId = patientRequestDTO.getUserId();
 
         log.info("Creating patient with userId: {}", userId);

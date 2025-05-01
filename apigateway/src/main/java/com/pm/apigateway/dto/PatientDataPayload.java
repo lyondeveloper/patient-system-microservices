@@ -4,8 +4,8 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record PatientDataPayload(
-        String id,
-        String userId,
+        Long id,
+        Long userId,
         String createdAt,
         String dateOfBirth,
         String registeredDate,

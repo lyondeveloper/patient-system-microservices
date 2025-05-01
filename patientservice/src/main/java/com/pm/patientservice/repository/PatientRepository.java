@@ -9,4 +9,5 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface PatientRepository extends ReactiveCrudRepository<Patient, Long> {
     Mono<Patient> findByUserId(Long userId);
+    Mono<Patient> findByIdAndUserId(Long id, Long userId);
 }

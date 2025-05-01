@@ -11,6 +11,7 @@ import jakarta.validation.groups.Default;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,12 +34,12 @@ public class PatientController {
 //        return ResponseEntity.ok().body(patients);
 //    }
 //
-//    @GetMapping("/{patientId}/byUserId/{userId}")
-//    @Operation(summary = "Get single patient by userId")
-//    public ResponseEntity<PatientResponseDTO> getPatientByUserId(@PathVariable String userId, @PathVariable String patientId) {
-//        PatientResponseDTO patient = patientService.getPatientByIdAndUserId(patientId, userId);
-//        return ResponseEntity.ok().body(patient);
-//    }
+    @GetMapping("/{patientId}")
+    @Operation(summary = "Get single patient by id")
+    public Mono<ResponseEntity<PatientResponseDTO>> getPatientById(@PathVariable String patientId) {
+        return patientService.getPatientById(patientId)
+                .map(ResponseEntity::ok);
+    }
 
 //    @PutMapping("/{id}")
 //    @Operation(summary = "Update a patient")

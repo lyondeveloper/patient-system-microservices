@@ -1,5 +1,5 @@
 ### GET patient by id
-GET http://localhost:4004/api/patients/f90e0203-2fbd-4db3-b7d8-b3a863a41559
+GET http://localhost:4004/api/patients/6
 Authorization: Bearer {{token}}
 
 ###
