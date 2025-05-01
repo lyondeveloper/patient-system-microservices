@@ -1,5 +1,8 @@
 package com.pm.accountservice.util;
 
+import lombok.Getter;
+
+@Getter
 public enum UserTypes {
     USER_PATIENT("USER_PATIENT"),
     USER_DEFAULT("USER_DEFAULT"),
@@ -10,10 +13,6 @@ public enum UserTypes {
 
     UserTypes(String userType) {
         this.userType = userType;
-    }
-
-    public String getUserType() {
-        return userType;
     }
 
     public static UserTypes fromName(String name) {
